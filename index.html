@@ -27,29 +27,31 @@
     </header>
     <main class="container">
       <div data-view="entry-form">
-        <div class="row">
-          <div class="column-full">
-            <h2>New Entry</h2>
-          </div>
-        </div>
-        <div class="row">
-          <div class="column-full">
-            <img
-              src="images/placeholder-image-square.jpg"
-              alt="gray image default" />
-          </div>
-        </div>
         <form>
           <div class="row">
             <div class="column-full">
-              <label for="title">Title</label>
-              <input required type="text" name="title" id="title" />
+              <h2>New Entry</h2>
             </div>
           </div>
           <div class="row">
-            <div class="column-full">
-              <label for="photo-url">Photo URL</label>
-              <input required type="url" name="url" id="photo-url" />
+            <div class="column-full column-half">
+              <img
+                src="images/placeholder-image-square.jpg"
+                alt="gray image default" />
+            </div>
+            <div class="column-full column-half">
+              <div class="row">
+                <div class="column-full">
+                  <label for="title">Title</label>
+                  <input required type="text" name="title" id="title" />
+                </div>
+              </div>
+              <div class="row">
+                <div class="column-full">
+                  <label for="photo-url">Photo URL</label>
+                  <input required type="url" name="url" id="photo-url" />
+                </div>
+              </div>
             </div>
           </div>
           <div class="row">

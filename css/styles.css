@@ -24,12 +24,13 @@ textarea {
   margin-top: 1rem;
 }
 
-textarea {
-  resize: vertical;
+input {
+  height: 1.5rem;
 }
 
 label {
   font-weight: bold;
+  font-size: 0.85rem;
 }
 
 button {
