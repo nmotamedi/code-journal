@@ -5,3 +5,11 @@
 body {
   margin: 0;
 }
+
+input {
+  display: block;
+}
+
+textarea {
+  display: block;
+}

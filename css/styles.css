@@ -1,0 +1,60 @@
+body {
+  background-color: #eee;
+}
+
+header {
+  background-color: #4c2474;
+}
+
+h2 {
+  font-size: 2rem;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  margin-block-start: 0.5rem;
+  margin-block-end: 0.5rem;
+}
+
+header h2 {
+  color: #fff;
+}
+
+img {
+  width: 100%;
+}
+
+.row {
+  margin-bottom: 1rem;
+}
+
+input,
+textarea {
+  width: 100%;
+  margin-top: 1rem;
+}
+
+input {
+  height: 1.5rem;
+}
+
+label {
+  font-weight: bold;
+  font-size: 0.85rem;
+}
+
+button {
+  text-transform: uppercase;
+  background-color: #4c2474;
+  color: #fff;
+  border-radius: 5px;
+  height: 30px;
+  width: 60px;
+  border: none;
+}
+
+.button-row {
+  justify-content: end;
+}
+
+.button-col {
+  flex-basis: content;
+}
