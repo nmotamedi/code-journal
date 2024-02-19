@@ -1,6 +1,6 @@
 /* exported data */
 
-const data: {
+let data: {
   view: string;
   entries: unknown[];
   editing: null;
@@ -14,5 +14,10 @@ const data: {
 
 window.addEventListener('beforeunload', () => {
   const dataJSON = JSON.stringify(data);
-  localStorage.set('journal-local-storage', dataJSON);
+  localStorage.setItem('journal-local-storage', dataJSON);
 });
+
+const previousDataJSON = localStorage.getItem('journal-local-storage');
+if (previousDataJSON) {
+  data = JSON.parse(previousDataJSON);
+}
