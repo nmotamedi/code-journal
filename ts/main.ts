@@ -12,12 +12,10 @@ if (!$urlLinkInput || !$entryForm)
   throw new Error('$urlLinkInput or $entryForm query failed');
 
 $urlLinkInput.addEventListener('input', (event: Event) => {
-  $urlLinkInput.addEventListener('blur', () => {
-    const eventTarget = event.target as HTMLInputElement;
-    if (eventTarget.value.match(/\.(jpeg|jpg|gif|png)$/)) {
-      $previewPhoto?.setAttribute('src', eventTarget.value);
-    }
-  });
+  const eventTarget = event.target as HTMLInputElement;
+  if (eventTarget.value.match(/\.(jpeg|jpg|gif|png)$/)) {
+    $previewPhoto?.setAttribute('src', eventTarget.value);
+  }
 });
 
 $entryForm.addEventListener('submit', (event: Event) => {
