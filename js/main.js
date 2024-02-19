@@ -1,13 +1,28 @@
 'use strict';
-// /* global data */
 const $urlLinkInput = document.querySelector('#photo-url');
-if (!$urlLinkInput) throw new Error('$urlLinkInput query failed');
+const $entryForm = document.querySelector('#entry-form');
+const $previewPhoto = document.querySelector('.preview');
+if (!$urlLinkInput || !$entryForm)
+  throw new Error('$urlLinkInput or $entryForm query failed');
 $urlLinkInput.addEventListener('input', (event) => {
   $urlLinkInput.addEventListener('blur', () => {
-    let eventTarget = event.target;
+    const eventTarget = event.target;
     if (eventTarget.value.match(/\.(jpeg|jpg|gif|png)$/)) {
-      let $previewPhoto = document.querySelector('.preview');
       $previewPhoto?.setAttribute('src', eventTarget.value);
     }
   });
+});
+$entryForm.addEventListener('submit', (event) => {
+  event.preventDefault();
+  const $formElements = $entryForm.elements;
+  const $formObject = {
+    title: $formElements.title.value,
+    url: $formElements.url.value,
+    notes: $formElements.notes.value,
+    entryID: data.nextEntryId,
+  };
+  data.nextEntryId++;
+  data.entries.unshift($formObject);
+  $entryForm.reset();
+  $previewPhoto?.setAttribute('src', 'images/placeholder-image-square.jpg');
 });
