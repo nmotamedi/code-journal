@@ -1,3 +1,7 @@
+body {
+  background-color: #eee;
+}
+
 header {
   background-color: #4c2474;
 }
@@ -8,4 +12,40 @@ header h2 {
 
 img {
   width: 100%;
+}
+
+.row {
+  margin-bottom: 1rem;
+}
+
+input,
+textarea {
+  width: 100%;
+  margin-top: 1rem;
+}
+
+textarea {
+  resize: vertical;
+}
+
+label {
+  font-weight: bold;
+}
+
+button {
+  text-transform: uppercase;
+  background-color: #4c2474;
+  color: #fff;
+  border-radius: 5px;
+  height: 30px;
+  width: 60px;
+  border: none;
+}
+
+.button-row {
+  justify-content: end;
+}
+
+.button-col {
+  flex-basis: content;
 }
