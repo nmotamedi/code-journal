@@ -2,7 +2,7 @@
 
 let data: {
   view: string;
-  entries: unknown[];
+  entries: FormObject[];
   editing: null;
   nextEntryId: number;
 } = {
