@@ -5,3 +5,7 @@ header {
 header h2 {
   color: #fff;
 }
+
+img {
+  width: 100%;
+}
