@@ -12,9 +12,9 @@ interface FormObject {
   entryID: number;
 }
 
-const $urlLinkInput = document.querySelector('#photo-url');
-const $titleInput = document.querySelector('#title');
-const $notesInput = document.querySelector('#notes');
+const $urlLinkInput = document.querySelector('#photo-url') as HTMLInputElement;
+const $titleInput = document.querySelector('#title') as HTMLInputElement;
+const $notesInput = document.querySelector('#notes') as HTMLTextAreaElement;
 const $entryForm = document.querySelector('#entry-form') as HTMLFormElement;
 const $previewPhoto = document.querySelector('.preview');
 const $ul = document.querySelector('ul');
@@ -68,11 +68,6 @@ $entryForm.addEventListener('submit', (event: Event) => {
     data.entries[updatingIndex] = updatingEntry;
     const $newEntry = renderEntry(updatingEntry);
     $ul.replaceChild($newEntry, $oldEntry);
-    $urlLinkInput.removeAttribute('value');
-    $titleInput?.removeAttribute('value');
-    $notesInput.textContent = '';
-    $entryTitle.textContent = 'New Entry';
-    data.editing = null;
     $entryTitle.textContent = 'New Entry';
     data.editing = null;
   }
@@ -175,9 +170,9 @@ $ul.addEventListener('click', (event: Event) => {
         data.editing = entry;
       }
     });
-    $urlLinkInput.setAttribute('value', data.editing!.url);
+    $urlLinkInput.value = data.editing!.url;
     $previewPhoto?.setAttribute('src', data.editing!.url);
-    $titleInput?.setAttribute('value', data.editing!.title);
+    $titleInput.value = data.editing!.title;
     $notesInput.textContent = data.editing!.notes;
     $entryTitle.textContent = 'Edit Entry';
   }

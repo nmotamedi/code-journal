@@ -53,11 +53,6 @@ $entryForm.addEventListener('submit', (event) => {
     data.entries[updatingIndex] = updatingEntry;
     const $newEntry = renderEntry(updatingEntry);
     $ul.replaceChild($newEntry, $oldEntry);
-    $urlLinkInput.removeAttribute('value');
-    $titleInput?.removeAttribute('value');
-    $notesInput.textContent = '';
-    $entryTitle.textContent = 'New Entry';
-    data.editing = null;
     $entryTitle.textContent = 'New Entry';
     data.editing = null;
   }
@@ -152,9 +147,9 @@ $ul.addEventListener('click', (event) => {
         data.editing = entry;
       }
     });
-    $urlLinkInput.setAttribute('value', data.editing.url);
+    $urlLinkInput.value = data.editing.url;
     $previewPhoto?.setAttribute('src', data.editing.url);
-    $titleInput?.setAttribute('value', data.editing.title);
+    $titleInput.value = data.editing.title;
     $notesInput.textContent = data.editing.notes;
     $entryTitle.textContent = 'Edit Entry';
   }
