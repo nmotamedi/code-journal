@@ -6,10 +6,35 @@ header {
   background-color: #4c2474;
 }
 
+a {
+  padding-left: 3rem;
+  font-size: 1.5rem;
+}
+
+.entries-title {
+  position: relative;
+}
+
+a.new {
+  position: absolute;
+  right: 0;
+  top: 0;
+  background-color: #4c2474;
+  color: #fff;
+  border-radius: 5px;
+  height: 35px;
+  width: 70px;
+  padding-left: 0;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+a:hover {
+  cursor: pointer;
+}
+
 h2 {
   font-size: 2rem;
-  margin-top: 1rem;
-  margin-bottom: 1rem;
   margin-block-start: 0.5rem;
   margin-block-end: 0.5rem;
 }
@@ -18,12 +43,35 @@ header h2 {
   color: #fff;
 }
 
-img {
-  width: 100%;
+.entries-title h2 {
+  display: inline;
+}
+
+h5 {
+  font-weight: 100;
+  text-align: center;
+  font-size: 1rem;
+}
+
+ul {
+  list-style-type: none;
+  padding-left: 0;
 }
 
 .row {
   margin-bottom: 1rem;
+}
+
+li .row {
+  margin-bottom: 0.4rem;
+}
+
+h4 {
+  margin-bottom: 0;
+}
+
+img {
+  width: 100%;
 }
 
 input,
