@@ -20,7 +20,7 @@
       <div class="container">
         <div class="row">
           <div class="column-full">
-            <h2>Code Journal</h2>
+            <h2>Code Journal<a data-switch="entries">Entries</a></h2>
           </div>
         </div>
       </div>
@@ -73,8 +73,14 @@
           </div>
         </form>
       </div>
-      <div data-view="entries">
-        <h5>No entries have been recorded.</h5>
+      <div data-view="entries" class="hidden">
+        <div class="row">
+          <div class="column-full entries-title">
+            <h2>Entries</h2>
+            <a class="new" data-switch="entry-form">New</a>
+          </div>
+        </div>
+        <h5 class="no-entries">No entries have been recorded.</h5>
         <ul></ul>
       </div>
     </main>

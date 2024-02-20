@@ -21,6 +21,13 @@ $entryForm.addEventListener('submit', (event) => {
   };
   data.nextEntryId++;
   data.entries.unshift($formObject);
+  const newEntry = renderEntry($formObject);
+  const $ul = document.querySelector('ul');
+  $ul?.prepend(newEntry);
+  viewSwap('entries');
+  if (data.entries.length > 0) {
+    toggleNoEntries();
+  }
   $entryForm.reset();
   $previewPhoto?.setAttribute('src', 'images/placeholder-image-square.jpg');
 });
@@ -63,5 +70,32 @@ document.addEventListener('DOMContentLoaded', () => {
     const newEntry = renderEntry(entry);
     const $ul = document.querySelector('ul');
     $ul?.append(newEntry);
+  });
+  viewSwap(data.view);
+  if (data.entries.length > 0) {
+    toggleNoEntries();
+  }
+});
+function toggleNoEntries() {
+  const $noEntries = document.querySelector('.no-entries');
+  $noEntries?.classList.toggle('hidden');
+}
+function viewSwap(view) {
+  let $views = document.querySelectorAll('[data-view]');
+  $views.forEach((div) => {
+    if (view === div.dataset.view) {
+      div.classList.remove('hidden');
+    } else {
+      div.classList.add('hidden');
+    }
+  });
+  data.view = view;
+}
+let $anchors = document.querySelectorAll('a');
+$anchors.forEach((anchor) => {
+  anchor.addEventListener('click', (event) => {
+    let $eventTarget = event.target;
+    let $switchValue = $eventTarget.dataset.switch;
+    viewSwap($switchValue);
   });
 });
