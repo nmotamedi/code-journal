@@ -96,7 +96,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function toggleNoEntries(): void {
   const $noEntries = document.querySelector('.no-entries');
-  $noEntries?.classList.toggle('hidden');
+  $noEntries?.classList.add('hidden');
 }
 
 function viewSwap(view: string): void {

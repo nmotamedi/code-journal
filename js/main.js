@@ -78,10 +78,10 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 function toggleNoEntries() {
   const $noEntries = document.querySelector('.no-entries');
-  $noEntries?.classList.toggle('hidden');
+  $noEntries?.classList.add('hidden');
 }
 function viewSwap(view) {
-  let $views = document.querySelectorAll('[data-view]');
+  const $views = document.querySelectorAll('[data-view]');
   $views.forEach((div) => {
     if (view === div.dataset.view) {
       div.classList.remove('hidden');
@@ -91,11 +91,11 @@ function viewSwap(view) {
   });
   data.view = view;
 }
-let $anchors = document.querySelectorAll('a');
+const $anchors = document.querySelectorAll('a');
 $anchors.forEach((anchor) => {
   anchor.addEventListener('click', (event) => {
-    let $eventTarget = event.target;
-    let $switchValue = $eventTarget.dataset.switch;
+    const $eventTarget = event.target;
+    const $switchValue = $eventTarget.dataset.switch;
     viewSwap($switchValue);
   });
 });
