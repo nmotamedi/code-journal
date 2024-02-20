@@ -40,20 +40,26 @@ $entryForm.addEventListener('submit', (event) => {
       notes: $formElements.notes.value,
       entryID: data.editing.entryID,
     };
-    let updatingIndex = data.entries.findIndex(
+    let updatingEntry = data.entries.find(
       (entry) => entry.entryID === $formObject.entryID
     );
-    data.entries[updatingIndex] = $formObject;
-    $ul.textContent = '';
-    data.entries.forEach((entry) => {
-      const $newEntry = renderEntry(entry);
-      $ul.append($newEntry);
-      $urlLinkInput.removeAttribute('value');
-      $titleInput?.removeAttribute('value');
-      $notesInput.textContent = '';
-      $entryTitle.textContent = 'New Entry';
-      data.editing = null;
-    });
+    const updatingIndex = data.entries.findIndex(
+      (entry) => updatingEntry === entry
+    );
+    const $oldEntry = document.querySelector(
+      `[data-id='${updatingEntry?.entryID}']`
+    );
+    updatingEntry = $formObject;
+    data.entries[updatingIndex] = updatingEntry;
+    const $newEntry = renderEntry(updatingEntry);
+    $ul.replaceChild($newEntry, $oldEntry);
+    $urlLinkInput.removeAttribute('value');
+    $titleInput?.removeAttribute('value');
+    $notesInput.textContent = '';
+    $entryTitle.textContent = 'New Entry';
+    data.editing = null;
+    $entryTitle.textContent = 'New Entry';
+    data.editing = null;
   }
   $entryForm.reset();
   $previewPhoto?.setAttribute('src', 'images/placeholder-image-square.jpg');
