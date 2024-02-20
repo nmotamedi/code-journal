@@ -18,9 +18,10 @@ const $notesInput = document.querySelector('#notes');
 const $entryForm = document.querySelector('#entry-form') as HTMLFormElement;
 const $previewPhoto = document.querySelector('.preview');
 const $ul = document.querySelector('ul');
-if (!$urlLinkInput || !$entryForm || !$ul || !$notesInput)
+const $entryTitle = document.querySelector('.entry-title');
+if (!$entryTitle || !$urlLinkInput || !$entryForm || !$ul || !$notesInput)
   throw new Error(
-    '$urlLinkInput, $entryForm, $ul, or $notesInput query failed'
+    '$urlLinkInput, $entryForm, $ul, $entryTitle, or $notesInput query failed'
   );
 
 $urlLinkInput.addEventListener('input', (event: Event) => {
@@ -33,22 +34,45 @@ $urlLinkInput.addEventListener('input', (event: Event) => {
 $entryForm.addEventListener('submit', (event: Event) => {
   event.preventDefault();
   const $formElements = $entryForm.elements as FormElements;
-  const $formObject: FormObject = {
-    title: $formElements.title.value,
-    url: $formElements.url.value,
-    notes: $formElements.notes.value,
-    entryID: data.nextEntryId,
-  };
-  data.nextEntryId++;
-  data.entries.unshift($formObject);
-  const $newEntry = renderEntry($formObject);
-  $ul?.prepend($newEntry);
-  viewSwap('entries');
-  if (data.entries.length > 0) {
-    toggleNoEntries();
+  if (data.editing === null) {
+    const $formObject: FormObject = {
+      title: $formElements.title.value,
+      url: $formElements.url.value,
+      notes: $formElements.notes.value,
+      entryID: data.nextEntryId,
+    };
+    data.nextEntryId++;
+    data.entries.unshift($formObject);
+    const $newEntry = renderEntry($formObject);
+    $ul.prepend($newEntry);
+    if (data.entries.length > 0) {
+      toggleNoEntries();
+    }
+  } else {
+    const $formObject: FormObject = {
+      title: $formElements.title.value,
+      url: $formElements.url.value,
+      notes: $formElements.notes.value,
+      entryID: data.editing.entryID,
+    };
+    const updatingIndex = data.entries.findIndex(
+      (entry: FormObject) => entry.entryID === $formObject.entryID
+    );
+    data.entries[updatingIndex] = $formObject;
+    $ul.textContent = '';
+    data.entries.forEach((entry: FormObject) => {
+      const $newEntry = renderEntry(entry);
+      $ul.append($newEntry);
+      $urlLinkInput.removeAttribute('value');
+      $titleInput?.removeAttribute('value');
+      $notesInput.textContent = '';
+      $entryTitle.textContent = 'New Entry';
+      data.editing = null;
+    });
   }
   $entryForm.reset();
   $previewPhoto?.setAttribute('src', 'images/placeholder-image-square.jpg');
+  viewSwap('entries');
 });
 
 function renderEntry(entry: FormObject): HTMLLIElement {
@@ -97,7 +121,7 @@ function renderEntry(entry: FormObject): HTMLLIElement {
 document.addEventListener('DOMContentLoaded', () => {
   data.entries.forEach((entry: FormObject) => {
     const $newEntry = renderEntry(entry);
-    $ul?.append($newEntry);
+    $ul.append($newEntry);
   });
   viewSwap(data.view);
   if (data.entries.length > 0) {
@@ -149,8 +173,6 @@ $ul.addEventListener('click', (event: Event) => {
     $previewPhoto?.setAttribute('src', data.editing!.url);
     $titleInput?.setAttribute('value', data.editing!.title);
     $notesInput.textContent = data.editing!.notes;
-    const $entryTitle = document.querySelector('.entry-title');
-    if (!$entryTitle) throw new Error('$entryTitle Query failed');
     $entryTitle.textContent = 'Edit Entry';
   }
 });
