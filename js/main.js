@@ -43,6 +43,8 @@ function renderEntry(entry) {
   $titleRowDiv.classList.add('row');
   const $titleColDiv = document.createElement('div');
   $titleColDiv.classList.add('column-full');
+  const $titleIconRow = document.createElement('div');
+  $titleIconRow.classList.add('row', 'icon-row');
   const $parRowDiv = document.createElement('div');
   $parRowDiv.classList.add('row');
   const $parColDiv = document.createElement('div');
@@ -52,11 +54,15 @@ function renderEntry(entry) {
   $image.setAttribute('alt', entry.title);
   const $title = document.createElement('h4');
   $title.textContent = entry.title;
+  const $icon = document.createElement('i');
+  $icon.classList.add('fa-solid', 'fa-pencil');
   const $paragraph = document.createElement('p');
   $paragraph.textContent = entry.notes;
   $parColDiv.appendChild($paragraph);
   $parRowDiv.appendChild($parColDiv);
-  $titleColDiv.appendChild($title);
+  $titleIconRow.appendChild($title);
+  $titleIconRow.appendChild($icon);
+  $titleColDiv.appendChild($titleIconRow);
   $titleRowDiv.appendChild($titleColDiv);
   $textColDiv.appendChild($titleRowDiv);
   $textColDiv.appendChild($parRowDiv);

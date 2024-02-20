@@ -99,6 +99,14 @@ button {
   border: none;
 }
 
+.icon-row {
+  justify-content: space-between;
+}
+
+.icon-row > h4 {
+  margin-top: 0;
+}
+
 .button-row {
   justify-content: end;
 }
