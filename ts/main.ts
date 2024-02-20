@@ -13,11 +13,15 @@ interface FormObject {
 }
 
 const $urlLinkInput = document.querySelector('#photo-url');
+const $titleInput = document.querySelector('#title');
+const $notesInput = document.querySelector('#notes');
 const $entryForm = document.querySelector('#entry-form') as HTMLFormElement;
 const $previewPhoto = document.querySelector('.preview');
 const $ul = document.querySelector('ul');
-if (!$urlLinkInput || !$entryForm || !$ul)
-  throw new Error('$urlLinkInput or $entryForm query failed');
+if (!$urlLinkInput || !$entryForm || !$ul || !$notesInput)
+  throw new Error(
+    '$urlLinkInput, $entryForm, $ul, or $notesInput query failed'
+  );
 
 $urlLinkInput.addEventListener('input', (event: Event) => {
   const eventTarget = event.target as HTMLInputElement;
@@ -49,6 +53,7 @@ $entryForm.addEventListener('submit', (event: Event) => {
 
 function renderEntry(entry: FormObject): HTMLLIElement {
   const $containingLi = document.createElement('li');
+  $containingLi.setAttribute('data-id', `${entry.entryID}`);
   const $containingRowDiv = document.createElement('div');
   $containingRowDiv.classList.add('row');
   const $imgColDiv = document.createElement('div');
@@ -126,4 +131,26 @@ $anchors.forEach((anchor: HTMLAnchorElement) => {
     const $switchValue: string = $eventTarget.dataset.switch!;
     viewSwap($switchValue);
   });
+});
+
+$ul.addEventListener('click', (event: Event) => {
+  const $eventTarget = event.target as HTMLElement;
+  const $li = $eventTarget.closest('li');
+  if (!$li) throw new Error('$li query failed');
+  if ($eventTarget.tagName === 'I') {
+    viewSwap('entry-form');
+    const $dataID: number = +$li.dataset.id!;
+    data.entries.forEach((entry: FormObject) => {
+      if ($dataID === entry.entryID) {
+        data.editing = entry;
+      }
+    });
+    $urlLinkInput.setAttribute('value', data.editing!.url);
+    $previewPhoto?.setAttribute('src', data.editing!.url);
+    $titleInput?.setAttribute('value', data.editing!.title);
+    $notesInput.textContent = data.editing!.notes;
+    const $entryTitle = document.querySelector('.entry-title');
+    if (!$entryTitle) throw new Error('$entryTitle Query failed');
+    $entryTitle.textContent = 'Edit Entry';
+  }
 });

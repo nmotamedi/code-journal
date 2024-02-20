@@ -3,7 +3,7 @@
 let data: {
   view: string;
   entries: FormObject[];
-  editing: null;
+  editing: null | FormObject;
   nextEntryId: number;
 } = {
   view: 'entry-form',

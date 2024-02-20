@@ -1,10 +1,14 @@
 'use strict';
 const $urlLinkInput = document.querySelector('#photo-url');
+const $titleInput = document.querySelector('#title');
+const $notesInput = document.querySelector('#notes');
 const $entryForm = document.querySelector('#entry-form');
 const $previewPhoto = document.querySelector('.preview');
 const $ul = document.querySelector('ul');
-if (!$urlLinkInput || !$entryForm || !$ul)
-  throw new Error('$urlLinkInput or $entryForm query failed');
+if (!$urlLinkInput || !$entryForm || !$ul || !$notesInput)
+  throw new Error(
+    '$urlLinkInput, $entryForm, $ul, or $notesInput query failed'
+  );
 $urlLinkInput.addEventListener('input', (event) => {
   const eventTarget = event.target;
   if (eventTarget.value.match(/\.(jpeg|jpg|gif|png)$/)) {
@@ -33,6 +37,7 @@ $entryForm.addEventListener('submit', (event) => {
 });
 function renderEntry(entry) {
   const $containingLi = document.createElement('li');
+  $containingLi.setAttribute('data-id', `${entry.entryID}`);
   const $containingRowDiv = document.createElement('div');
   $containingRowDiv.classList.add('row');
   const $imgColDiv = document.createElement('div');
@@ -104,4 +109,25 @@ $anchors.forEach((anchor) => {
     const $switchValue = $eventTarget.dataset.switch;
     viewSwap($switchValue);
   });
+});
+$ul.addEventListener('click', (event) => {
+  let $eventTarget = event.target;
+  let $li = $eventTarget.closest('li');
+  if (!$li) throw new Error('$li query failed');
+  if ($eventTarget.tagName === 'I') {
+    viewSwap('entry-form');
+    let $dataID = +$li.dataset.id;
+    data.entries.forEach((entry) => {
+      if ($dataID === entry.entryID) {
+        data.editing = entry;
+      }
+    });
+    $urlLinkInput.setAttribute('value', data.editing.url);
+    $previewPhoto?.setAttribute('src', data.editing.url);
+    $titleInput?.setAttribute('value', data.editing.title);
+    $notesInput.textContent = data.editing.notes;
+    let $entryTitle = document.querySelector('.entry-title');
+    if (!$entryTitle) throw new Error('$entryTitle Query failed');
+    $entryTitle.textContent = 'Edit Entry';
+  }
 });
