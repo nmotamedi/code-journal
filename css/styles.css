@@ -19,23 +19,22 @@ a.new {
   position: absolute;
   right: 0;
   top: 0;
-  bottom: 0;
   background-color: #4c2474;
   color: #fff;
-  border: none;
   border-radius: 5px;
   height: 35px;
   width: 70px;
   padding-left: 0;
   text-align: center;
   text-transform: uppercase;
-  font-size: 1.5rem;
+}
+
+a:hover {
+  cursor: pointer;
 }
 
 h2 {
   font-size: 2rem;
-  margin-top: 1rem;
-  margin-bottom: 1rem;
   margin-block-start: 0.5rem;
   margin-block-end: 0.5rem;
 }
