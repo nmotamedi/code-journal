@@ -1,10 +1,15 @@
 'use strict';
 const $urlLinkInput = document.querySelector('#photo-url');
+const $titleInput = document.querySelector('#title');
+const $notesInput = document.querySelector('#notes');
 const $entryForm = document.querySelector('#entry-form');
 const $previewPhoto = document.querySelector('.preview');
 const $ul = document.querySelector('ul');
-if (!$urlLinkInput || !$entryForm || !$ul)
-  throw new Error('$urlLinkInput or $entryForm query failed');
+const $entryTitle = document.querySelector('.entry-title');
+if (!$entryTitle || !$urlLinkInput || !$entryForm || !$ul || !$notesInput)
+  throw new Error(
+    '$urlLinkInput, $entryForm, $ul, $entryTitle, or $notesInput query failed'
+  );
 $urlLinkInput.addEventListener('input', (event) => {
   const eventTarget = event.target;
   if (eventTarget.value.match(/\.(jpeg|jpg|gif|png)$/)) {
@@ -14,25 +19,50 @@ $urlLinkInput.addEventListener('input', (event) => {
 $entryForm.addEventListener('submit', (event) => {
   event.preventDefault();
   const $formElements = $entryForm.elements;
-  const $formObject = {
-    title: $formElements.title.value,
-    url: $formElements.url.value,
-    notes: $formElements.notes.value,
-    entryID: data.nextEntryId,
-  };
-  data.nextEntryId++;
-  data.entries.unshift($formObject);
-  const $newEntry = renderEntry($formObject);
-  $ul?.prepend($newEntry);
-  viewSwap('entries');
-  if (data.entries.length > 0) {
-    toggleNoEntries();
+  if (data.editing === null) {
+    const $formObject = {
+      title: $formElements.title.value,
+      url: $formElements.url.value,
+      notes: $formElements.notes.value,
+      entryID: data.nextEntryId,
+    };
+    data.nextEntryId++;
+    data.entries.unshift($formObject);
+    const $newEntry = renderEntry($formObject);
+    $ul.prepend($newEntry);
+    if (data.entries.length > 0) {
+      toggleNoEntries();
+    }
+  } else {
+    const $formObject = {
+      title: $formElements.title.value,
+      url: $formElements.url.value,
+      notes: $formElements.notes.value,
+      entryID: data.editing.entryID,
+    };
+    let updatingEntry = data.entries.find(
+      (entry) => entry.entryID === $formObject.entryID
+    );
+    const updatingIndex = data.entries.findIndex(
+      (entry) => updatingEntry === entry
+    );
+    const $oldEntry = document.querySelector(
+      `[data-id='${updatingEntry?.entryID}']`
+    );
+    updatingEntry = $formObject;
+    data.entries[updatingIndex] = updatingEntry;
+    const $newEntry = renderEntry(updatingEntry);
+    $ul.replaceChild($newEntry, $oldEntry);
+    $entryTitle.textContent = 'New Entry';
+    data.editing = null;
   }
   $entryForm.reset();
   $previewPhoto?.setAttribute('src', 'images/placeholder-image-square.jpg');
+  viewSwap('entries');
 });
 function renderEntry(entry) {
   const $containingLi = document.createElement('li');
+  $containingLi.setAttribute('data-id', `${entry.entryID}`);
   const $containingRowDiv = document.createElement('div');
   $containingRowDiv.classList.add('row');
   const $imgColDiv = document.createElement('div');
@@ -43,6 +73,8 @@ function renderEntry(entry) {
   $titleRowDiv.classList.add('row');
   const $titleColDiv = document.createElement('div');
   $titleColDiv.classList.add('column-full');
+  const $titleIconRow = document.createElement('div');
+  $titleIconRow.classList.add('row', 'icon-row');
   const $parRowDiv = document.createElement('div');
   $parRowDiv.classList.add('row');
   const $parColDiv = document.createElement('div');
@@ -52,11 +84,15 @@ function renderEntry(entry) {
   $image.setAttribute('alt', entry.title);
   const $title = document.createElement('h4');
   $title.textContent = entry.title;
+  const $icon = document.createElement('i');
+  $icon.classList.add('fa-solid', 'fa-pencil');
   const $paragraph = document.createElement('p');
   $paragraph.textContent = entry.notes;
   $parColDiv.appendChild($paragraph);
   $parRowDiv.appendChild($parColDiv);
-  $titleColDiv.appendChild($title);
+  $titleIconRow.appendChild($title);
+  $titleIconRow.appendChild($icon);
+  $titleColDiv.appendChild($titleIconRow);
   $titleRowDiv.appendChild($titleColDiv);
   $textColDiv.appendChild($titleRowDiv);
   $textColDiv.appendChild($parRowDiv);
@@ -69,7 +105,7 @@ function renderEntry(entry) {
 document.addEventListener('DOMContentLoaded', () => {
   data.entries.forEach((entry) => {
     const $newEntry = renderEntry(entry);
-    $ul?.append($newEntry);
+    $ul.append($newEntry);
   });
   viewSwap(data.view);
   if (data.entries.length > 0) {
@@ -98,4 +134,23 @@ $anchors.forEach((anchor) => {
     const $switchValue = $eventTarget.dataset.switch;
     viewSwap($switchValue);
   });
+});
+$ul.addEventListener('click', (event) => {
+  const $eventTarget = event.target;
+  const $li = $eventTarget.closest('li');
+  if (!$li) throw new Error('$li query failed');
+  if ($eventTarget.tagName === 'I') {
+    viewSwap('entry-form');
+    const $dataID = +$li.dataset.id;
+    data.entries.forEach((entry) => {
+      if ($dataID === entry.entryID) {
+        data.editing = entry;
+      }
+    });
+    $urlLinkInput.value = data.editing.url;
+    $previewPhoto?.setAttribute('src', data.editing.url);
+    $titleInput.value = data.editing.title;
+    $notesInput.textContent = data.editing.notes;
+    $entryTitle.textContent = 'Edit Entry';
+  }
 });
