@@ -149,4 +149,5 @@ button {
 
 dialog {
   border-radius: 10px;
+  border: solid black 1px;
 }
