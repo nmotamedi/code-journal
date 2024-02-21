@@ -19,10 +19,27 @@ const $entryForm = document.querySelector('#entry-form') as HTMLFormElement;
 const $previewPhoto = document.querySelector('.preview');
 const $ul = document.querySelector('ul');
 const $entryTitle = document.querySelector('.entry-title');
-if (!$entryTitle || !$urlLinkInput || !$entryForm || !$ul || !$notesInput)
+const $deleteButton = document.querySelector('.delete-col');
+const $openModal = document.querySelector('.open-modal');
+const $closeModal = document.querySelector('.dismiss-modal');
+const $dialog = document.querySelector('dialog');
+const $confirmDelete = document.querySelector('.confirm-delete');
+if (
+  !$entryTitle ||
+  !$urlLinkInput ||
+  !$entryForm ||
+  !$ul ||
+  !$notesInput ||
+  !$deleteButton
+)
   throw new Error(
-    '$urlLinkInput, $entryForm, $ul, $entryTitle, or $notesInput query failed'
+    '$urlLinkInput, $entryForm, $ul, $entryTitle, $deleteButton or $notesInput query failed'
   );
+if (!$openModal || !$closeModal || !$dialog || !$confirmDelete) {
+  throw new Error(
+    '$openModal, $closeModal, $dialog, $confirmDelete query failed'
+  );
+}
 
 $urlLinkInput.addEventListener('input', (event: Event) => {
   const eventTarget = event.target as HTMLInputElement;
@@ -70,6 +87,7 @@ $entryForm.addEventListener('submit', (event: Event) => {
     $ul.replaceChild($newEntry, $oldEntry);
     $entryTitle.textContent = 'New Entry';
     data.editing = null;
+    $deleteButton!.classList.add('hide');
   }
   $entryForm.reset();
   $previewPhoto?.setAttribute('src', 'images/placeholder-image-square.jpg');
@@ -164,6 +182,7 @@ $ul.addEventListener('click', (event: Event) => {
   if (!$li) throw new Error('$li query failed');
   if ($eventTarget.tagName === 'I') {
     viewSwap('entry-form');
+    $deleteButton!.classList.remove('hide');
     const $dataID: number = +$li.dataset.id!;
     data.entries.forEach((entry: FormObject) => {
       if ($dataID === entry.entryID) {
@@ -176,4 +195,12 @@ $ul.addEventListener('click', (event: Event) => {
     $notesInput.textContent = data.editing!.notes;
     $entryTitle.textContent = 'Edit Entry';
   }
+});
+
+$openModal.addEventListener('click', () => {
+  $dialog.showModal();
+});
+
+$closeModal.addEventListener('click', () => {
+  $dialog.close();
 });

@@ -6,10 +6,27 @@ const $entryForm = document.querySelector('#entry-form');
 const $previewPhoto = document.querySelector('.preview');
 const $ul = document.querySelector('ul');
 const $entryTitle = document.querySelector('.entry-title');
-if (!$entryTitle || !$urlLinkInput || !$entryForm || !$ul || !$notesInput)
+const $deleteButton = document.querySelector('.delete-col');
+const $openModal = document.querySelector('.open-modal');
+const $closeModal = document.querySelector('.dismiss-modal');
+const $dialog = document.querySelector('dialog');
+const $confirmDelete = document.querySelector('.confirm-delete');
+if (
+  !$entryTitle ||
+  !$urlLinkInput ||
+  !$entryForm ||
+  !$ul ||
+  !$notesInput ||
+  !$deleteButton
+)
   throw new Error(
-    '$urlLinkInput, $entryForm, $ul, $entryTitle, or $notesInput query failed'
+    '$urlLinkInput, $entryForm, $ul, $entryTitle, $deleteButton or $notesInput query failed'
   );
+if (!$openModal || !$closeModal || !$dialog || !$confirmDelete) {
+  throw new Error(
+    '$openModal, $closeModal, $dialog, $confirmDelete query failed'
+  );
+}
 $urlLinkInput.addEventListener('input', (event) => {
   const eventTarget = event.target;
   if (eventTarget.value.match(/\.(jpeg|jpg|gif|png)$/)) {
@@ -55,6 +72,7 @@ $entryForm.addEventListener('submit', (event) => {
     $ul.replaceChild($newEntry, $oldEntry);
     $entryTitle.textContent = 'New Entry';
     data.editing = null;
+    $deleteButton.classList.add('hide');
   }
   $entryForm.reset();
   $previewPhoto?.setAttribute('src', 'images/placeholder-image-square.jpg');
@@ -141,6 +159,7 @@ $ul.addEventListener('click', (event) => {
   if (!$li) throw new Error('$li query failed');
   if ($eventTarget.tagName === 'I') {
     viewSwap('entry-form');
+    $deleteButton.classList.remove('hide');
     const $dataID = +$li.dataset.id;
     data.entries.forEach((entry) => {
       if ($dataID === entry.entryID) {
@@ -153,4 +172,10 @@ $ul.addEventListener('click', (event) => {
     $notesInput.textContent = data.editing.notes;
     $entryTitle.textContent = 'Edit Entry';
   }
+});
+$openModal.addEventListener('click', () => {
+  $dialog.showModal();
+});
+$closeModal.addEventListener('click', () => {
+  $dialog.close();
 });

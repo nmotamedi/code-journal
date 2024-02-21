@@ -67,11 +67,29 @@
             </div>
           </div>
           <div class="row button-row">
-            <div class="column-full button-col">
+            <div class="column-half delete-col hide">
+              <h5 class="open-modal">Delete Entry</h5>
+            </div>
+            <div class="column-half button-col">
               <button type="submit">Save</button>
             </div>
           </div>
         </form>
+        <dialog>
+          <div class="row">
+            <div class="column-full">
+              <h5>Are you sure you want to delete this entry?</h5>
+            </div>
+          </div>
+          <div class="row modal-buttons-row">
+            <div class="column-half">
+              <button class="dismiss-modal">Cancel</button>
+            </div>
+            <div class="column-half">
+              <button class="confirm-delete">Confirm</button>
+            </div>
+          </div>
+        </dialog>
       </div>
       <div data-view="entries" class="hidden">
         <div class="row">

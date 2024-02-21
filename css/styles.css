@@ -108,9 +108,45 @@ button {
 }
 
 .button-row {
-  justify-content: end;
+  justify-content: space-between;
 }
 
 .button-col {
   flex-basis: content;
+}
+
+.delete-col {
+  flex-basis: content;
+}
+
+.delete-col > h5 {
+  margin-top: 0;
+  text-decoration: underline;
+  color: rgb(200, 0, 0);
+}
+
+.modal-buttons-row {
+  justify-content: space-between;
+}
+
+.modal-buttons-row > .column-half {
+  flex-basis: content;
+}
+
+.modal-buttons-row > .column-half > button {
+  width: 80px;
+}
+
+.dismiss-modal {
+  background-color: #b6b6b6;
+  color: #292929;
+}
+
+.confirm-delete {
+  background-color: #dc2627;
+  color: #fff;
+}
+
+dialog {
+  border-radius: 10px;
 }
