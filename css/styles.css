@@ -13,6 +13,7 @@ a {
 a.new {
   text-align: center;
   text-transform: uppercase;
+  width: 100%;
 }
 
 a:hover {
@@ -151,6 +152,8 @@ dialog {
   background-color: #4c2474;
   color: #fff;
   border-radius: 5px;
+  height: 30px;
+  width: 100px;
 }
 
 .header-row {
