@@ -72,9 +72,14 @@ $entryForm.addEventListener('submit', (event: Event) => {
       entryID: data.nextEntryId,
     };
     data.nextEntryId++;
-    data.entries.unshift($formObject);
     const $newEntry = renderEntry($formObject);
-    $ul.prepend($newEntry);
+    if (data.sort === 'newest-down') {
+      data.entries.unshift($formObject);
+      $ul.prepend($newEntry);
+    } else {
+      data.entries.push($formObject);
+      $ul.appendChild($newEntry);
+    }
     toggleNoEntries();
   } else {
     const $formObject: FormObject = {

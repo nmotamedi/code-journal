@@ -165,6 +165,7 @@ dialog {
 
 .sort-col {
   width: 80px;
+  padding: 0;
 }
 
 #entries-sort {
