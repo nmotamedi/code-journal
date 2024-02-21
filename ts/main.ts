@@ -5,6 +5,11 @@ interface FormElements extends HTMLFormControlsCollection {
   notes: HTMLTextAreaElement;
 }
 
+interface SearchFormElements extends HTMLFormControlsCollection {
+  search: HTMLInputElement;
+  'search-select': HTMLSelectElement;
+}
+
 interface FormObject {
   title: string;
   url: string;
@@ -19,21 +24,26 @@ const $entryForm = document.querySelector('#entry-form') as HTMLFormElement;
 const $previewPhoto = document.querySelector('.preview');
 const $ul = document.querySelector('ul');
 const $entryTitle = document.querySelector('.entry-title');
+const $entriesTitle = document.querySelector('.entries-title > h2');
 const $deleteButton = document.querySelector('.delete-col');
 const $openModal = document.querySelector('.open-modal');
 const $closeModal = document.querySelector('.dismiss-modal');
 const $dialog = document.querySelector('dialog');
 const $confirmDelete = document.querySelector('.confirm-delete');
+const $searchBar = document.querySelector('.search-col');
+const $search = document.querySelector('#search-bar') as HTMLFormElement;
 if (
   !$entryTitle ||
+  !$entriesTitle ||
   !$urlLinkInput ||
   !$entryForm ||
   !$ul ||
   !$notesInput ||
-  !$deleteButton
+  !$deleteButton ||
+  !$search
 )
   throw new Error(
-    '$urlLinkInput, $entryForm, $ul, $entryTitle, $deleteButton or $notesInput query failed'
+    '$urlLinkInput, $entryForm, $ul, $entryTitle, $deleteButton, $search or $notesInput query failed'
   );
 if (!$openModal || !$closeModal || !$dialog || !$confirmDelete) {
   throw new Error(
@@ -161,10 +171,20 @@ function viewSwap(view: string): void {
       div.classList.add('hidden');
     }
   });
+  if (view === 'entries') {
+    $searchBar?.classList.remove('hidden');
+  } else if (view === 'entry-form') {
+    $searchBar?.classList.add('hidden');
+  }
+  for (const entry of data.entries) {
+    const $entry = document.querySelector(`[data-id='${entry.entryID}']`);
+    $entry?.classList.remove('hidden');
+  }
   data.view = view;
   $entryForm.reset();
   $previewPhoto?.setAttribute('src', 'images/placeholder-image-square.jpg');
   $deleteButton!.classList.add('hide');
+  $entriesTitle!.textContent = 'Entries';
   $entryTitle!.textContent = 'New Entry';
 }
 
@@ -219,4 +239,30 @@ $confirmDelete.addEventListener('click', () => {
   toggleNoEntries();
   viewSwap('entries');
   data.editing = null;
+});
+
+$search.addEventListener('submit', (event: Event) => {
+  event.preventDefault();
+  const $formElements = $search.elements as SearchFormElements;
+  const $searchQuery: string = $formElements.search.value;
+  const $searchSelector: string = $formElements['search-select'].value;
+  $search.reset();
+  $entriesTitle!.textContent = 'Search Results:';
+  console.log($searchQuery);
+  console.log($searchSelector);
+  for (const entry of data.entries) {
+    let prop = '';
+    switch ($searchSelector) {
+      case 'title':
+        prop = entry.title;
+        break;
+      case 'notes':
+        prop = entry.notes;
+        break;
+    }
+    if (!prop.includes($searchQuery)) {
+      const $oldEntry = document.querySelector(`[data-id='${entry.entryID}']`);
+      $oldEntry?.classList.add('hidden');
+    }
+  }
 });

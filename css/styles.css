@@ -157,15 +157,49 @@ dialog {
 }
 
 .header-row {
-  justify-content: flex-start;
+  justify-content: space-between;
   align-items: center;
 }
 
-.header-row > div {
+.main-header-row > div {
   flex-basis: content;
+}
+
+.main-header-row {
+  margin-bottom: 0;
+  align-items: center;
+}
+
+.main-header-col {
+  padding-left: 0;
 }
 
 .entries-anchor {
   color: white;
   margin-left: 20px;
+}
+
+.search-col {
+  flex-basis: 50%;
+}
+
+#search {
+  margin-top: 0;
+  width: 50%;
+}
+
+#search-bar > input {
+  display: inline;
+}
+
+#search-bar > select {
+  height: 23px;
+}
+
+#search-bar > button {
+  background-color: #fff;
+  color: #4c2474;
+  border-radius: 5px;
+  width: fit-content;
+  height: 23px;
 }

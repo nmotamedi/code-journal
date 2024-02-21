@@ -19,11 +19,26 @@
     <header>
       <div class="container">
         <div class="row header-row">
-          <div class="column-half journal-title">
-            <h2>Code Journal</h2>
+          <div class="column-half main-header-col">
+            <div class="row main-header-row">
+              <div class="column-half journal-title">
+                <h2>Code Journal</h2>
+              </div>
+              <div class="column-half entries-anchor">
+                <a data-switch="entries">Entries</a>
+              </div>
+            </div>
           </div>
-          <div class="entries-anchor">
-            <a data-switch="entries">Entries</a>
+          <div class="column-half search-col hidden">
+            <form id="search-bar">
+              <input required type="text" id="search" placeholder="search..." />
+              <select required name="search-by" id="search-select">
+                <option value="">Search by</option>
+                <option value="title">Title</option>
+                <option value="notes">Notes</option>
+              </select>
+              <button>Search</button>
+            </form>
           </div>
         </div>
       </div>
