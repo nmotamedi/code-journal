@@ -125,7 +125,7 @@ document.addEventListener('DOMContentLoaded', () => {
   DOMLoadHandler();
   viewSwap(data.view);
   const options = $entriesSort.children;
-  for (let option of options) {
+  for (const option of options) {
     if (option.getAttribute('value') === data.sort) {
       option.defaultSelected = true;
     }
@@ -221,11 +221,15 @@ $confirmDelete.addEventListener('click', () => {
 });
 $search.addEventListener('submit', (event) => {
   event.preventDefault();
+  for (const entry of data.entries) {
+    const $entry = document.querySelector(`[data-id='${entry.entryID}']`);
+    $entry?.classList.remove('hidden');
+  }
   const $formElements = $search.elements;
   const $searchQuery = $formElements.search.value;
   const $searchSelector = $formElements['search-select'].value;
   $search.reset();
-  $entriesTitle.textContent = 'Search Results:';
+  $entriesTitle.textContent = 'Results:';
   $entriesSort.classList.add('hidden');
   for (const entry of data.entries) {
     let prop = '';

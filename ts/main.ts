@@ -258,11 +258,15 @@ $confirmDelete.addEventListener('click', () => {
 
 $search.addEventListener('submit', (event: Event) => {
   event.preventDefault();
+  for (const entry of data.entries) {
+    const $entry = document.querySelector(`[data-id='${entry.entryID}']`);
+    $entry?.classList.remove('hidden');
+  }
   const $formElements = $search.elements as SearchFormElements;
   const $searchQuery: string = $formElements.search.value;
   const $searchSelector: string = $formElements['search-select'].value;
   $search.reset();
-  $entriesTitle!.textContent = 'Search Results:';
+  $entriesTitle!.textContent = 'Results:';
   $entriesSort.classList.add('hidden');
   for (const entry of data.entries) {
     let prop = '';

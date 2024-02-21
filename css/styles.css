@@ -163,6 +163,10 @@ dialog {
   align-items: center;
 }
 
+.sort-col {
+  width: 80px;
+}
+
 #entries-sort {
   height: 30px;
   border-radius: 5px;
@@ -201,18 +205,21 @@ dialog {
 }
 
 .search-row {
-  align-items: center;
   margin-bottom: 0;
   justify-content: flex-end;
 }
 
 #search-bar {
-  flex-basis: 81%;
+  flex-basis: 82%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 #search-bar > input {
   display: inline;
   border-radius: 5px;
+  width: 160px;
 }
 
 #search-bar > select {
