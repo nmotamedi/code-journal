@@ -148,12 +148,24 @@ dialog {
   flex-basis: content;
 }
 
-.entries-new {
+.new-col {
   background-color: #4c2474;
   color: #fff;
   border-radius: 5px;
   height: 30px;
   width: 100px;
+  padding: 0;
+  text-align: center;
+}
+
+.sort-new-row {
+  margin-bottom: 0;
+  align-items: center;
+}
+
+#entries-sort {
+  height: 30px;
+  border-radius: 5px;
 }
 
 .header-row {
@@ -188,12 +200,24 @@ dialog {
   width: 50%;
 }
 
+.search-row {
+  align-items: center;
+  margin-bottom: 0;
+  justify-content: flex-end;
+}
+
+#search-bar {
+  flex-basis: 81%;
+}
+
 #search-bar > input {
   display: inline;
+  border-radius: 5px;
 }
 
 #search-bar > select {
-  height: 23px;
+  height: 21px;
+  border-radius: 5px;
 }
 
 #search-bar > button {
@@ -201,5 +225,5 @@ dialog {
   color: #4c2474;
   border-radius: 5px;
   width: fit-content;
-  height: 23px;
+  height: 21px;
 }

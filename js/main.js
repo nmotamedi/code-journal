@@ -14,6 +14,7 @@ const $dialog = document.querySelector('dialog');
 const $confirmDelete = document.querySelector('.confirm-delete');
 const $searchBar = document.querySelector('.search-col');
 const $search = document.querySelector('#search-bar');
+const $entriesSort = document.querySelector('#entries-sort');
 if (
   !$entryTitle ||
   !$entriesTitle ||
@@ -121,13 +122,23 @@ function renderEntry(entry) {
   return $containingLi;
 }
 document.addEventListener('DOMContentLoaded', () => {
+  DOMLoadHandler();
+  viewSwap(data.view);
+  const options = $entriesSort.children;
+  for (let option of options) {
+    if (option.getAttribute('value') === data.sort) {
+      option.defaultSelected = true;
+    }
+  }
+  toggleNoEntries();
+});
+function DOMLoadHandler() {
+  $ul.textContent = '';
   data.entries.forEach((entry) => {
     const $newEntry = renderEntry(entry);
     $ul.append($newEntry);
   });
-  viewSwap(data.view);
-  toggleNoEntries();
-});
+}
 function toggleNoEntries() {
   const $noEntries = document.querySelector('.no-entries');
   if (data.entries.length > 0) {
@@ -160,6 +171,7 @@ function viewSwap(view) {
   $deleteButton.classList.add('hide');
   $entriesTitle.textContent = 'Entries';
   $entryTitle.textContent = 'New Entry';
+  $entriesSort.classList.remove('hidden');
 }
 const $anchors = document.querySelectorAll('a');
 $anchors.forEach((anchor) => {
@@ -214,8 +226,7 @@ $search.addEventListener('submit', (event) => {
   const $searchSelector = $formElements['search-select'].value;
   $search.reset();
   $entriesTitle.textContent = 'Search Results:';
-  console.log($searchQuery);
-  console.log($searchSelector);
+  $entriesSort.classList.add('hidden');
   for (const entry of data.entries) {
     let prop = '';
     switch ($searchSelector) {
@@ -230,5 +241,14 @@ $search.addEventListener('submit', (event) => {
       const $oldEntry = document.querySelector(`[data-id='${entry.entryID}']`);
       $oldEntry?.classList.add('hidden');
     }
+  }
+});
+$entriesSort?.addEventListener('input', (event) => {
+  const $eventTarget = event.target;
+  const $sortValue = $eventTarget.value;
+  if ($sortValue !== data.sort) {
+    data.entries = data.entries.reverse();
+    DOMLoadHandler();
+    data.sort = $sortValue;
   }
 });

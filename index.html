@@ -30,15 +30,21 @@
             </div>
           </div>
           <div class="column-half search-col hidden">
-            <form id="search-bar">
-              <input required type="text" id="search" placeholder="search..." />
-              <select required name="search-by" id="search-select">
-                <option value="">Search by</option>
-                <option value="title">Title</option>
-                <option value="notes">Notes</option>
-              </select>
-              <button>Search</button>
-            </form>
+            <div class="row search-row">
+              <form id="search-bar">
+                <input
+                  required
+                  type="search"
+                  id="search"
+                  placeholder="search..." />
+                <select required name="search-by" id="search-select">
+                  <option value="">Search by</option>
+                  <option value="title">Title</option>
+                  <option value="notes">Notes</option>
+                </select>
+                <button>Search</button>
+              </form>
+            </div>
           </div>
         </div>
       </div>
@@ -115,7 +121,17 @@
             <h2>Entries</h2>
           </div>
           <div class="column-half entries-new">
-            <a class="new" data-switch="entry-form">New</a>
+            <div class="row sort-new-row">
+              <div class="column-half sort-col">
+                <select name="entries-select" id="entries-sort">
+                  <option value="newest-down">Newest &darr;</option>
+                  <option value="oldest-down">Newest &uarr;</option>
+                </select>
+              </div>
+              <div class="column-half new-col">
+                <a class="new" data-switch="entry-form">New</a>
+              </div>
+            </div>
           </div>
         </div>
         <h5 class="no-entries">No entries have been recorded.</h5>

@@ -5,11 +5,13 @@ let data: {
   entries: FormObject[];
   editing: null | FormObject;
   nextEntryId: number;
+  sort: string;
 } = {
   view: 'entry-form',
   entries: [],
   editing: null,
   nextEntryId: 1,
+  sort: 'newest-down',
 };
 
 window.addEventListener('beforeunload', () => {
