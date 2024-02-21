@@ -6,10 +6,27 @@ const $entryForm = document.querySelector('#entry-form');
 const $previewPhoto = document.querySelector('.preview');
 const $ul = document.querySelector('ul');
 const $entryTitle = document.querySelector('.entry-title');
-if (!$entryTitle || !$urlLinkInput || !$entryForm || !$ul || !$notesInput)
+const $deleteButton = document.querySelector('.delete-col');
+const $openModal = document.querySelector('.open-modal');
+const $closeModal = document.querySelector('.dismiss-modal');
+const $dialog = document.querySelector('dialog');
+const $confirmDelete = document.querySelector('.confirm-delete');
+if (
+  !$entryTitle ||
+  !$urlLinkInput ||
+  !$entryForm ||
+  !$ul ||
+  !$notesInput ||
+  !$deleteButton
+)
   throw new Error(
-    '$urlLinkInput, $entryForm, $ul, $entryTitle, or $notesInput query failed'
+    '$urlLinkInput, $entryForm, $ul, $entryTitle, $deleteButton or $notesInput query failed'
   );
+if (!$openModal || !$closeModal || !$dialog || !$confirmDelete) {
+  throw new Error(
+    '$openModal, $closeModal, $dialog, $confirmDelete query failed'
+  );
+}
 $urlLinkInput.addEventListener('input', (event) => {
   const eventTarget = event.target;
   if (eventTarget.value.match(/\.(jpeg|jpg|gif|png)$/)) {
@@ -30,9 +47,7 @@ $entryForm.addEventListener('submit', (event) => {
     data.entries.unshift($formObject);
     const $newEntry = renderEntry($formObject);
     $ul.prepend($newEntry);
-    if (data.entries.length > 0) {
-      toggleNoEntries();
-    }
+    toggleNoEntries();
   } else {
     const $formObject = {
       title: $formElements.title.value,
@@ -53,11 +68,9 @@ $entryForm.addEventListener('submit', (event) => {
     data.entries[updatingIndex] = updatingEntry;
     const $newEntry = renderEntry(updatingEntry);
     $ul.replaceChild($newEntry, $oldEntry);
-    $entryTitle.textContent = 'New Entry';
     data.editing = null;
+    $deleteButton.classList.add('hide');
   }
-  $entryForm.reset();
-  $previewPhoto?.setAttribute('src', 'images/placeholder-image-square.jpg');
   viewSwap('entries');
 });
 function renderEntry(entry) {
@@ -108,13 +121,15 @@ document.addEventListener('DOMContentLoaded', () => {
     $ul.append($newEntry);
   });
   viewSwap(data.view);
-  if (data.entries.length > 0) {
-    toggleNoEntries();
-  }
+  toggleNoEntries();
 });
 function toggleNoEntries() {
   const $noEntries = document.querySelector('.no-entries');
-  $noEntries?.classList.add('hidden');
+  if (data.entries.length > 0) {
+    $noEntries?.classList.add('hidden');
+  } else {
+    $noEntries?.classList.remove('hidden');
+  }
 }
 function viewSwap(view) {
   const $views = document.querySelectorAll('[data-view]');
@@ -126,6 +141,10 @@ function viewSwap(view) {
     }
   });
   data.view = view;
+  $entryForm.reset();
+  $previewPhoto?.setAttribute('src', 'images/placeholder-image-square.jpg');
+  $deleteButton.classList.add('hide');
+  $entryTitle.textContent = 'New Entry';
 }
 const $anchors = document.querySelectorAll('a');
 $anchors.forEach((anchor) => {
@@ -139,18 +158,37 @@ $ul.addEventListener('click', (event) => {
   const $eventTarget = event.target;
   const $li = $eventTarget.closest('li');
   if (!$li) throw new Error('$li query failed');
-  if ($eventTarget.tagName === 'I') {
-    viewSwap('entry-form');
-    const $dataID = +$li.dataset.id;
-    data.entries.forEach((entry) => {
-      if ($dataID === entry.entryID) {
-        data.editing = entry;
-      }
-    });
-    $urlLinkInput.value = data.editing.url;
-    $previewPhoto?.setAttribute('src', data.editing.url);
-    $titleInput.value = data.editing.title;
-    $notesInput.textContent = data.editing.notes;
-    $entryTitle.textContent = 'Edit Entry';
+  if ($eventTarget.tagName !== 'I') {
+    return;
   }
+  viewSwap('entry-form');
+  $deleteButton.classList.remove('hide');
+  const $dataID = +$li.dataset.id;
+  data.entries.forEach((entry) => {
+    if ($dataID === entry.entryID) {
+      data.editing = entry;
+    }
+  });
+  $urlLinkInput.value = data.editing.url;
+  $previewPhoto?.setAttribute('src', data.editing.url);
+  $titleInput.value = data.editing.title;
+  $notesInput.value = data.editing.notes;
+  $entryTitle.textContent = 'Edit Entry';
+});
+$openModal.addEventListener('click', () => {
+  $dialog.showModal();
+});
+$closeModal.addEventListener('click', () => {
+  $dialog.close();
+});
+$confirmDelete.addEventListener('click', () => {
+  $dialog.close();
+  data.entries = data.entries.filter((entry) => entry !== data.editing);
+  const $oldEntry = document.querySelector(
+    `[data-id='${data.editing.entryID}']`
+  );
+  $ul.removeChild($oldEntry);
+  toggleNoEntries();
+  viewSwap('entries');
+  data.editing = null;
 });
