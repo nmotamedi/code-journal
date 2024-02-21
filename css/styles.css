@@ -7,24 +7,10 @@ header {
 }
 
 a {
-  padding-left: 3rem;
   font-size: 1.5rem;
 }
 
-.entries-title {
-  position: relative;
-}
-
 a.new {
-  position: absolute;
-  right: 0;
-  top: 0;
-  background-color: #4c2474;
-  color: #fff;
-  border-radius: 5px;
-  height: 35px;
-  width: 70px;
-  padding-left: 0;
   text-align: center;
   text-transform: uppercase;
 }
@@ -150,4 +136,33 @@ button {
 dialog {
   border-radius: 10px;
   border: solid black 1px;
+}
+
+.entries-title-row {
+  justify-content: space-between;
+  align-items: center;
+}
+
+.entries-title-row > div {
+  flex-basis: content;
+}
+
+.entries-new {
+  background-color: #4c2474;
+  color: #fff;
+  border-radius: 5px;
+}
+
+.header-row {
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.header-row > div {
+  flex-basis: content;
+}
+
+.entries-anchor {
+  color: white;
+  margin-left: 20px;
 }

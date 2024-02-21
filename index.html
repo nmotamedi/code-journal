@@ -18,9 +18,12 @@
   <body>
     <header>
       <div class="container">
-        <div class="row">
-          <div class="column-full">
-            <h2>Code Journal<a data-switch="entries">Entries</a></h2>
+        <div class="row header-row">
+          <div class="column-half journal-title">
+            <h2>Code Journal</h2>
+          </div>
+          <div class="entries-anchor">
+            <a data-switch="entries">Entries</a>
           </div>
         </div>
       </div>
@@ -92,9 +95,11 @@
         </dialog>
       </div>
       <div data-view="entries" class="hidden">
-        <div class="row">
-          <div class="column-full entries-title">
+        <div class="row entries-title-row">
+          <div class="column-half entries-title">
             <h2>Entries</h2>
+          </div>
+          <div class="column-half entries-new">
             <a class="new" data-switch="entry-form">New</a>
           </div>
         </div>
