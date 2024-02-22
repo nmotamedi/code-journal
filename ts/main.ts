@@ -74,6 +74,7 @@ $tagsInput.addEventListener('keydown', (event: KeyboardEvent) => {
   if (event.key !== ' ') {
     return;
   }
+  event.preventDefault();
   const tag = $tagsInput.value.trim();
   if (currentTags.includes(tag)) {
     $tagsInput.value = '';
