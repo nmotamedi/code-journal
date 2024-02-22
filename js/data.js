@@ -6,6 +6,7 @@ let data = {
   editing: null,
   nextEntryId: 1,
   sort: 'newest-down',
+  tags: [],
 };
 window.addEventListener('beforeunload', () => {
   const dataJSON = JSON.stringify(data);

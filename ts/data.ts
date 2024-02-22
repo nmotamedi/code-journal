@@ -6,12 +6,14 @@ let data: {
   editing: null | FormObject;
   nextEntryId: number;
   sort: string;
+  tags: string[];
 } = {
   view: 'entry-form',
   entries: [],
   editing: null,
   nextEntryId: 1,
   sort: 'newest-down',
+  tags: [],
 };
 
 window.addEventListener('beforeunload', () => {

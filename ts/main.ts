@@ -15,11 +15,13 @@ interface FormObject {
   url: string;
   notes: string;
   entryID: number;
+  tags: string[];
 }
 
 const $urlLinkInput = document.querySelector('#photo-url') as HTMLInputElement;
 const $titleInput = document.querySelector('#title') as HTMLInputElement;
 const $notesInput = document.querySelector('#notes') as HTMLTextAreaElement;
+const $tagsInput = document.querySelector('#tags') as HTMLInputElement;
 const $entryForm = document.querySelector('#entry-form') as HTMLFormElement;
 const $previewPhoto = document.querySelector('.preview');
 const $ul = document.querySelector('ul');
@@ -31,7 +33,11 @@ const $closeModal = document.querySelector('.dismiss-modal');
 const $dialog = document.querySelector('dialog');
 const $confirmDelete = document.querySelector('.confirm-delete');
 const $searchBar = document.querySelector('.search-col');
+const $tagContainer = document.querySelector('.tag-container');
 const $search = document.querySelector('#search-bar') as HTMLFormElement;
+const $tagList = document.querySelector('#tagList');
+const $warning = document.querySelector('.warning');
+let currentTags: string[] = [];
 const $entriesSort = document.querySelector(
   '#entries-sort'
 ) as HTMLSelectElement;
@@ -43,10 +49,12 @@ if (
   !$ul ||
   !$notesInput ||
   !$deleteButton ||
-  !$search
+  !$search ||
+  !$tagsInput ||
+  !$tagList
 )
   throw new Error(
-    '$urlLinkInput, $entryForm, $ul, $entryTitle, $deleteButton, $search or $notesInput query failed'
+    '$urlLinkInput, $entryForm, $ul, $tagList, $entryTitle, $deleteButton, $search, $tagsInput or $notesInput query failed'
   );
 if (!$openModal || !$closeModal || !$dialog || !$confirmDelete) {
   throw new Error(
@@ -61,6 +69,34 @@ $urlLinkInput.addEventListener('input', (event: Event) => {
   }
 });
 
+$tagsInput.addEventListener('keydown', (event: KeyboardEvent) => {
+  $warning?.classList.add('hidden');
+  if (event.key !== ' ') {
+    return;
+  }
+  event.preventDefault();
+  const tag = $tagsInput.value.trim();
+  if (currentTags.includes(tag)) {
+    $tagsInput.value = '';
+    $warning!.textContent = `${tag} has already been added`;
+    $warning?.classList.remove('hidden');
+    return;
+  }
+  $tagsInput.focus();
+  $tagsInput.value = '';
+  $tagsInput.placeholder = '';
+  const $tagWrapper = document.createElement('div');
+  $tagWrapper.classList.add('column', 'tag-wrapper');
+  const $icon = document.createElement('i');
+  $icon.classList.add('fa-solid', 'fa-tag');
+  const $tagText = document.createElement('p');
+  currentTags.push(tag);
+  $tagText.textContent = tag;
+  $tagWrapper.appendChild($icon);
+  $tagWrapper.appendChild($tagText);
+  $tagContainer?.appendChild($tagWrapper);
+});
+
 $entryForm.addEventListener('submit', (event: Event) => {
   event.preventDefault();
   const $formElements = $entryForm.elements as FormElements;
@@ -70,6 +106,7 @@ $entryForm.addEventListener('submit', (event: Event) => {
       url: $formElements.url.value,
       notes: $formElements.notes.value,
       entryID: data.nextEntryId,
+      tags: currentTags,
     };
     data.nextEntryId++;
     const $newEntry = renderEntry($formObject);
@@ -87,6 +124,7 @@ $entryForm.addEventListener('submit', (event: Event) => {
       url: $formElements.url.value,
       notes: $formElements.notes.value,
       entryID: data.editing.entryID,
+      tags: currentTags,
     };
     let updatingEntry = data.entries.find(
       (entry: FormObject) => entry.entryID === $formObject.entryID
@@ -103,6 +141,15 @@ $entryForm.addEventListener('submit', (event: Event) => {
     $ul.replaceChild($newEntry, $oldEntry);
     data.editing = null;
     $deleteButton!.classList.add('hide');
+  }
+  for (const tagMaster of currentTags) {
+    if (!data.tags.includes(tagMaster)) {
+      data.tags.push(tagMaster);
+      const $tagOption = document.createElement('option');
+      $tagOption.value = tagMaster;
+      $tagOption.textContent = tagMaster;
+      $tagList.appendChild($tagOption);
+    }
   }
   viewSwap('entries');
 });
@@ -134,6 +181,19 @@ function renderEntry(entry: FormObject): HTMLLIElement {
   const $icon = document.createElement('i');
   $icon.classList.add('fa-solid', 'fa-pencil');
   const $paragraph = document.createElement('p');
+  const $tagEntriesContainer = document.createElement('div');
+  $tagEntriesContainer.classList.add('row', 'tag-container');
+  for (const tag of entry.tags) {
+    const $tagWrapper = document.createElement('div');
+    $tagWrapper.classList.add('column', 'tag-wrapper');
+    const $tagIcon = document.createElement('i');
+    $tagIcon.classList.add('fa-solid', 'fa-tag');
+    const $tagText = document.createElement('p');
+    $tagText.textContent = tag;
+    $tagWrapper.appendChild($tagIcon);
+    $tagWrapper.appendChild($tagText);
+    $tagEntriesContainer.appendChild($tagWrapper);
+  }
   $paragraph.textContent = entry.notes;
   $parColDiv.appendChild($paragraph);
   $parRowDiv.appendChild($parColDiv);
@@ -146,6 +206,7 @@ function renderEntry(entry: FormObject): HTMLLIElement {
   $imgColDiv.appendChild($image);
   $containingRowDiv.appendChild($imgColDiv);
   $containingRowDiv.appendChild($textColDiv);
+  $textColDiv.appendChild($tagEntriesContainer);
   $containingLi.appendChild($containingRowDiv);
   return $containingLi;
 }
@@ -167,6 +228,12 @@ function DOMLoadHandler(): void {
   data.entries.forEach((entry: FormObject) => {
     const $newEntry = renderEntry(entry);
     $ul!.append($newEntry);
+  });
+  data.tags.forEach((tag: string) => {
+    const $tagOption = document.createElement('option');
+    $tagOption.value = tag;
+    $tagOption.textContent = tag;
+    $tagList!.appendChild($tagOption);
   });
 }
 
@@ -201,11 +268,13 @@ function viewSwap(view: string): void {
   }
   data.view = view;
   $entryForm.reset();
+  currentTags = [];
   $previewPhoto?.setAttribute('src', 'images/placeholder-image-square.jpg');
   $deleteButton!.classList.add('hide');
   $entriesTitle!.textContent = 'Entries';
   $entryTitle!.textContent = 'New Entry';
   $entriesSort.classList.remove('hidden');
+  $tagContainer!.textContent = '';
 }
 
 const $anchors = document.querySelectorAll('a');
@@ -221,7 +290,7 @@ $ul.addEventListener('click', (event: Event) => {
   const $eventTarget = event.target as HTMLElement;
   const $li = $eventTarget.closest('li');
   if (!$li) throw new Error('$li query failed');
-  if ($eventTarget.tagName !== 'I') {
+  if (!$eventTarget.className.includes('fa-pencil')) {
     return;
   }
   viewSwap('entry-form');
@@ -232,6 +301,18 @@ $ul.addEventListener('click', (event: Event) => {
       data.editing = entry;
     }
   });
+  for (const tag of data.editing!.tags) {
+    const $tagWrapper = document.createElement('div');
+    $tagWrapper.classList.add('column', 'tag-wrapper');
+    const $icon = document.createElement('i');
+    $icon.classList.add('fa-solid', 'fa-tag');
+    const $tagText = document.createElement('p');
+    $tagText.textContent = tag;
+    $tagWrapper.appendChild($icon);
+    $tagWrapper.appendChild($tagText);
+    $tagContainer?.appendChild($tagWrapper);
+  }
+  currentTags = data.editing!.tags;
   $urlLinkInput.value = data.editing!.url;
   $previewPhoto?.setAttribute('src', data.editing!.url);
   $titleInput.value = data.editing!.title;
@@ -249,6 +330,18 @@ $closeModal.addEventListener('click', () => {
 
 $confirmDelete.addEventListener('click', () => {
   $dialog.close();
+  for (const $tagText of data.editing!.tags) {
+    let count = 0;
+    data.entries.forEach((entry: FormObject) => {
+      if (entry.tags.includes($tagText!)) {
+        count++;
+      }
+    });
+    if (count === 1) {
+      const masterTagIndex = data.tags.indexOf($tagText!);
+      data.tags.splice(masterTagIndex, 1);
+    }
+  }
   data.entries = data.entries.filter(
     (entry: FormObject) => entry !== data.editing
   );
@@ -298,4 +391,25 @@ $entriesSort?.addEventListener('input', (event: Event) => {
     DOMLoadHandler();
     data.sort = $sortValue;
   }
+});
+
+$tagContainer?.addEventListener('click', (event: Event) => {
+  const $eventTarget = event.target as HTMLElement;
+  const $tagDiv = $eventTarget.closest('div') as Node;
+  const $tagText = $tagDiv?.textContent;
+  if (data.editing !== null) {
+    let count = 0;
+    data.entries.forEach((entry: FormObject) => {
+      if (entry.tags.includes($tagText!)) {
+        count++;
+      }
+    });
+    if (count === 1) {
+      const masterTagIndex = data.tags.indexOf($tagText!);
+      data.tags.splice(masterTagIndex, 1);
+    }
+  }
+  $tagContainer.removeChild($tagDiv);
+  const currentTagIndex = currentTags.indexOf($tagText!);
+  currentTags.splice(currentTagIndex, 1);
 });
