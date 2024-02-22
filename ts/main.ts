@@ -32,6 +32,9 @@ const $dialog = document.querySelector('dialog');
 const $confirmDelete = document.querySelector('.confirm-delete');
 const $searchBar = document.querySelector('.search-col');
 const $search = document.querySelector('#search-bar') as HTMLFormElement;
+const $entriesSort = document.querySelector(
+  '#entries-sort'
+) as HTMLSelectElement;
 if (
   !$entryTitle ||
   !$entriesTitle ||
@@ -69,9 +72,14 @@ $entryForm.addEventListener('submit', (event: Event) => {
       entryID: data.nextEntryId,
     };
     data.nextEntryId++;
-    data.entries.unshift($formObject);
     const $newEntry = renderEntry($formObject);
-    $ul.prepend($newEntry);
+    if (data.sort === 'newest-down') {
+      data.entries.unshift($formObject);
+      $ul.prepend($newEntry);
+    } else {
+      data.entries.push($formObject);
+      $ul.appendChild($newEntry);
+    }
     toggleNoEntries();
   } else {
     const $formObject: FormObject = {
@@ -143,13 +151,24 @@ function renderEntry(entry: FormObject): HTMLLIElement {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  data.entries.forEach((entry: FormObject) => {
-    const $newEntry = renderEntry(entry);
-    $ul.append($newEntry);
-  });
+  DOMLoadHandler();
   viewSwap(data.view);
+  const options = $entriesSort.children as HTMLCollectionOf<HTMLOptionElement>;
+  for (const option of options) {
+    if (option.getAttribute('value') === data.sort) {
+      option.defaultSelected = true;
+    }
+  }
   toggleNoEntries();
 });
+
+function DOMLoadHandler(): void {
+  $ul!.textContent = '';
+  data.entries.forEach((entry: FormObject) => {
+    const $newEntry = renderEntry(entry);
+    $ul!.append($newEntry);
+  });
+}
 
 function toggleNoEntries(): void {
   const $noEntries = document.querySelector('.no-entries');
@@ -186,6 +205,7 @@ function viewSwap(view: string): void {
   $deleteButton!.classList.add('hide');
   $entriesTitle!.textContent = 'Entries';
   $entryTitle!.textContent = 'New Entry';
+  $entriesSort.classList.remove('hidden');
 }
 
 const $anchors = document.querySelectorAll('a');
@@ -243,13 +263,16 @@ $confirmDelete.addEventListener('click', () => {
 
 $search.addEventListener('submit', (event: Event) => {
   event.preventDefault();
+  for (const entry of data.entries) {
+    const $entry = document.querySelector(`[data-id='${entry.entryID}']`);
+    $entry?.classList.remove('hidden');
+  }
   const $formElements = $search.elements as SearchFormElements;
   const $searchQuery: string = $formElements.search.value;
   const $searchSelector: string = $formElements['search-select'].value;
   $search.reset();
-  $entriesTitle!.textContent = 'Search Results:';
-  console.log($searchQuery);
-  console.log($searchSelector);
+  $entriesTitle!.textContent = 'Results:';
+  $entriesSort.classList.add('hidden');
   for (const entry of data.entries) {
     let prop = '';
     switch ($searchSelector) {
@@ -264,5 +287,15 @@ $search.addEventListener('submit', (event: Event) => {
       const $oldEntry = document.querySelector(`[data-id='${entry.entryID}']`);
       $oldEntry?.classList.add('hidden');
     }
+  }
+});
+
+$entriesSort?.addEventListener('input', (event: Event) => {
+  const $eventTarget = event.target as HTMLSelectElement;
+  const $sortValue = $eventTarget.value;
+  if ($sortValue !== data.sort) {
+    data.entries = data.entries.reverse();
+    DOMLoadHandler();
+    data.sort = $sortValue;
   }
 });
