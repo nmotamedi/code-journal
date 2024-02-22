@@ -374,9 +374,14 @@ $entriesSort?.addEventListener('input', (event: Event) => {
 });
 
 $tagContainer?.addEventListener('click', (event: Event) => {
-  const $eventTarget = event.target as HTMLDivElement;
+  console.log(currentTags);
+  const $eventTarget = event.target as HTMLElement;
+  const $tagDiv = $eventTarget.closest('div') as Node;
+  const $tagText = $tagDiv?.textContent;
   if (data.editing === null) {
-    console.log($eventTarget);
-    // $tagContainer.removeChild($eventTarget);
+    $tagContainer.removeChild($tagDiv);
+    const tagIndex = currentTags.indexOf($tagText!);
+    currentTags.splice(tagIndex, 1);
   }
+  console.log(currentTags);
 });

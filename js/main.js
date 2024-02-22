@@ -51,7 +51,7 @@ $tagsInput.addEventListener('keydown', (event) => {
   if (event.key !== ' ') {
     return;
   }
-  let tag = $tagsInput.value.trim();
+  const tag = $tagsInput.value.trim();
   if (currentTags.includes(tag)) {
     $tagsInput.value = '';
     $warning.textContent = `${tag} has already been added`;
@@ -117,7 +117,7 @@ $entryForm.addEventListener('submit', (event) => {
     data.editing = null;
     $deleteButton.classList.add('hide');
   }
-  for (let tagMaster of currentTags) {
+  for (const tagMaster of currentTags) {
     if (!data.tags.includes(tagMaster)) {
       data.tags.push(tagMaster);
       const $tagOption = document.createElement('option');
@@ -157,12 +157,12 @@ function renderEntry(entry) {
   const $paragraph = document.createElement('p');
   const $tagEntriesContainer = document.createElement('div');
   $tagEntriesContainer.classList.add('row', 'tag-container');
-  for (let tag of entry.tags) {
-    let $tagWrapper = document.createElement('div');
+  for (const tag of entry.tags) {
+    const $tagWrapper = document.createElement('div');
     $tagWrapper.classList.add('column', 'tag-wrapper');
-    let $tagIcon = document.createElement('i');
+    const $tagIcon = document.createElement('i');
     $tagIcon.classList.add('fa-solid', 'fa-tag');
-    let $tagText = document.createElement('p');
+    const $tagText = document.createElement('p');
     $tagText.textContent = tag;
     $tagWrapper.appendChild($tagIcon);
     $tagWrapper.appendChild($tagText);
@@ -261,7 +261,7 @@ $ul.addEventListener('click', (event) => {
       data.editing = entry;
     }
   });
-  for (let tag of data.editing.tags) {
+  for (const tag of data.editing.tags) {
     const $tagWrapper = document.createElement('div');
     $tagWrapper.classList.add('column', 'tag-wrapper');
     const $icon = document.createElement('i');
@@ -333,9 +333,14 @@ $entriesSort?.addEventListener('input', (event) => {
   }
 });
 $tagContainer?.addEventListener('click', (event) => {
-  let $eventTarget = event.target;
+  console.log(currentTags);
+  const $eventTarget = event.target;
+  const $tagDiv = $eventTarget.closest('div');
+  const $tagText = $tagDiv?.textContent;
   if (data.editing === null) {
-    console.log($eventTarget);
-    // $tagContainer.removeChild($eventTarget);
+    $tagContainer.removeChild($tagDiv);
+    const tagIndex = currentTags.indexOf($tagText);
+    currentTags.splice(tagIndex, 1);
   }
+  console.log(currentTags);
 });

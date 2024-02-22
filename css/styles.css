@@ -259,6 +259,10 @@ dialog {
   color: rgba(0, 0, 0, 0.489);
 }
 
+.tag-wrapper:hover {
+  cursor: pointer;
+}
+
 .fa-pencil:hover {
   cursor: pointer;
 }
