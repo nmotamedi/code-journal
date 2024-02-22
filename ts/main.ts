@@ -229,6 +229,12 @@ function DOMLoadHandler(): void {
     const $newEntry = renderEntry(entry);
     $ul!.append($newEntry);
   });
+  data.tags.forEach((tag: string) => {
+    const $tagOption = document.createElement('option');
+    $tagOption.value = tag;
+    $tagOption.textContent = tag;
+    $tagList!.appendChild($tagOption);
+  });
 }
 
 function toggleNoEntries(): void {
@@ -306,6 +312,7 @@ $ul.addEventListener('click', (event: Event) => {
     $tagWrapper.appendChild($tagText);
     $tagContainer?.appendChild($tagWrapper);
   }
+  currentTags = data.editing!.tags;
   $urlLinkInput.value = data.editing!.url;
   $previewPhoto?.setAttribute('src', data.editing!.url);
   $titleInput.value = data.editing!.title;
@@ -323,6 +330,18 @@ $closeModal.addEventListener('click', () => {
 
 $confirmDelete.addEventListener('click', () => {
   $dialog.close();
+  for (const $tagText of data.editing!.tags) {
+    let count = 0;
+    data.entries.forEach((entry: FormObject) => {
+      if (entry.tags.includes($tagText!)) {
+        count++;
+      }
+    });
+    if (count === 1) {
+      const masterTagIndex = data.tags.indexOf($tagText!);
+      data.tags.splice(masterTagIndex, 1);
+    }
+  }
   data.entries = data.entries.filter(
     (entry: FormObject) => entry !== data.editing
   );
@@ -375,14 +394,22 @@ $entriesSort?.addEventListener('input', (event: Event) => {
 });
 
 $tagContainer?.addEventListener('click', (event: Event) => {
-  console.log(currentTags);
   const $eventTarget = event.target as HTMLElement;
   const $tagDiv = $eventTarget.closest('div') as Node;
   const $tagText = $tagDiv?.textContent;
-  if (data.editing === null) {
-    $tagContainer.removeChild($tagDiv);
-    const tagIndex = currentTags.indexOf($tagText!);
-    currentTags.splice(tagIndex, 1);
+  if (data.editing !== null) {
+    let count = 0;
+    data.entries.forEach((entry: FormObject) => {
+      if (entry.tags.includes($tagText!)) {
+        count++;
+      }
+    });
+    if (count === 1) {
+      const masterTagIndex = data.tags.indexOf($tagText!);
+      data.tags.splice(masterTagIndex, 1);
+    }
   }
-  console.log(currentTags);
+  $tagContainer.removeChild($tagDiv);
+  const currentTagIndex = currentTags.indexOf($tagText!);
+  currentTags.splice(currentTagIndex, 1);
 });

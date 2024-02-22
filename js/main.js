@@ -202,6 +202,12 @@ function DOMLoadHandler() {
     const $newEntry = renderEntry(entry);
     $ul.append($newEntry);
   });
+  data.tags.forEach((tag) => {
+    const $tagOption = document.createElement('option');
+    $tagOption.value = tag;
+    $tagOption.textContent = tag;
+    $tagList.appendChild($tagOption);
+  });
 }
 function toggleNoEntries() {
   const $noEntries = document.querySelector('.no-entries');
@@ -273,6 +279,7 @@ $ul.addEventListener('click', (event) => {
     $tagWrapper.appendChild($tagText);
     $tagContainer?.appendChild($tagWrapper);
   }
+  currentTags = data.editing.tags;
   $urlLinkInput.value = data.editing.url;
   $previewPhoto?.setAttribute('src', data.editing.url);
   $titleInput.value = data.editing.title;
@@ -287,6 +294,18 @@ $closeModal.addEventListener('click', () => {
 });
 $confirmDelete.addEventListener('click', () => {
   $dialog.close();
+  for (let $tagText of data.editing.tags) {
+    let count = 0;
+    data.entries.forEach((entry) => {
+      if (entry.tags.includes($tagText)) {
+        count++;
+      }
+    });
+    if (count === 1) {
+      let masterTagIndex = data.tags.indexOf($tagText);
+      data.tags.splice(masterTagIndex, 1);
+    }
+  }
   data.entries = data.entries.filter((entry) => entry !== data.editing);
   const $oldEntry = document.querySelector(
     `[data-id='${data.editing.entryID}']`
@@ -334,14 +353,22 @@ $entriesSort?.addEventListener('input', (event) => {
   }
 });
 $tagContainer?.addEventListener('click', (event) => {
-  console.log(currentTags);
   const $eventTarget = event.target;
   const $tagDiv = $eventTarget.closest('div');
   const $tagText = $tagDiv?.textContent;
-  if (data.editing === null) {
-    $tagContainer.removeChild($tagDiv);
-    const tagIndex = currentTags.indexOf($tagText);
-    currentTags.splice(tagIndex, 1);
+  if (data.editing !== null) {
+    let count = 0;
+    data.entries.forEach((entry) => {
+      if (entry.tags.includes($tagText)) {
+        count++;
+      }
+    });
+    if (count === 1) {
+      let masterTagIndex = data.tags.indexOf($tagText);
+      data.tags.splice(masterTagIndex, 1);
+    }
   }
-  console.log(currentTags);
+  $tagContainer.removeChild($tagDiv);
+  let currentTagIndex = currentTags.indexOf($tagText);
+  currentTags.splice(currentTagIndex, 1);
 });
