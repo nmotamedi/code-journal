@@ -16,6 +16,8 @@ const $confirmDelete = document.querySelector('.confirm-delete');
 const $searchBar = document.querySelector('.search-col');
 const $tagContainer = document.querySelector('.tag-container');
 const $search = document.querySelector('#search-bar');
+const $tagList = document.querySelector('#tagList');
+const $warning = document.querySelector('.warning');
 let currentTags = [];
 const $entriesSort = document.querySelector('#entries-sort');
 if (
@@ -27,10 +29,11 @@ if (
   !$notesInput ||
   !$deleteButton ||
   !$search ||
-  !$tagsInput
+  !$tagsInput ||
+  !$tagList
 )
   throw new Error(
-    '$urlLinkInput, $entryForm, $ul, $entryTitle, $deleteButton, $search, $tagsInput or $notesInput query failed'
+    '$urlLinkInput, $entryForm, $ul, $tagList, $entryTitle, $deleteButton, $search, $tagsInput or $notesInput query failed'
   );
 if (!$openModal || !$closeModal || !$dialog || !$confirmDelete) {
   throw new Error(
@@ -44,11 +47,20 @@ $urlLinkInput.addEventListener('input', (event) => {
   }
 });
 $tagsInput.addEventListener('keydown', (event) => {
-  if (event.key !== 'Enter') {
+  $warning?.classList.add('hidden');
+  if (event.key !== ' ') {
     return;
   }
-  const tag = $tagsInput.value;
+  let tag = $tagsInput.value.trim();
+  if (currentTags.includes(tag)) {
+    $tagsInput.value = '';
+    $warning.textContent = `${tag} has already been added`;
+    $warning?.classList.remove('hidden');
+    return;
+  }
+  $tagsInput.focus();
   $tagsInput.value = '';
+  $tagsInput.placeholder = '';
   const $tagWrapper = document.createElement('div');
   $tagWrapper.classList.add('column', 'tag-wrapper');
   const $icon = document.createElement('i');
@@ -63,7 +75,6 @@ $tagsInput.addEventListener('keydown', (event) => {
 $entryForm.addEventListener('submit', (event) => {
   event.preventDefault();
   const $formElements = $entryForm.elements;
-  currentTags = currentTags.map((tag) => tag.replace(/\n/g, ''));
   if (data.editing === null) {
     const $formObject = {
       title: $formElements.title.value,
@@ -72,7 +83,6 @@ $entryForm.addEventListener('submit', (event) => {
       entryID: data.nextEntryId,
       tags: currentTags,
     };
-    console.log($formObject.tags);
     data.nextEntryId++;
     const $newEntry = renderEntry($formObject);
     if (data.sort === 'newest-down') {
@@ -107,6 +117,15 @@ $entryForm.addEventListener('submit', (event) => {
     data.editing = null;
     $deleteButton.classList.add('hide');
   }
+  for (let tagMaster of currentTags) {
+    if (!data.tags.includes(tagMaster)) {
+      data.tags.push(tagMaster);
+      const $tagOption = document.createElement('option');
+      $tagOption.value = tagMaster;
+      $tagOption.textContent = tagMaster;
+      $tagList.appendChild($tagOption);
+    }
+  }
   viewSwap('entries');
 });
 function renderEntry(entry) {
@@ -136,6 +155,19 @@ function renderEntry(entry) {
   const $icon = document.createElement('i');
   $icon.classList.add('fa-solid', 'fa-pencil');
   const $paragraph = document.createElement('p');
+  const $tagEntriesContainer = document.createElement('div');
+  $tagEntriesContainer.classList.add('row', 'tag-container');
+  for (let tag of entry.tags) {
+    let $tagWrapper = document.createElement('div');
+    $tagWrapper.classList.add('column', 'tag-wrapper');
+    let $tagIcon = document.createElement('i');
+    $tagIcon.classList.add('fa-solid', 'fa-tag');
+    let $tagText = document.createElement('p');
+    $tagText.textContent = tag;
+    $tagWrapper.appendChild($tagIcon);
+    $tagWrapper.appendChild($tagText);
+    $tagEntriesContainer.appendChild($tagWrapper);
+  }
   $paragraph.textContent = entry.notes;
   $parColDiv.appendChild($paragraph);
   $parRowDiv.appendChild($parColDiv);
@@ -148,6 +180,7 @@ function renderEntry(entry) {
   $imgColDiv.appendChild($image);
   $containingRowDiv.appendChild($imgColDiv);
   $containingRowDiv.appendChild($textColDiv);
+  $textColDiv.appendChild($tagEntriesContainer);
   $containingLi.appendChild($containingRowDiv);
   return $containingLi;
 }
@@ -217,7 +250,7 @@ $ul.addEventListener('click', (event) => {
   const $eventTarget = event.target;
   const $li = $eventTarget.closest('li');
   if (!$li) throw new Error('$li query failed');
-  if ($eventTarget.tagName !== 'I') {
+  if (!$eventTarget.className.includes('fa-pencil')) {
     return;
   }
   viewSwap('entry-form');
@@ -228,6 +261,17 @@ $ul.addEventListener('click', (event) => {
       data.editing = entry;
     }
   });
+  for (let tag of data.editing.tags) {
+    const $tagWrapper = document.createElement('div');
+    $tagWrapper.classList.add('column', 'tag-wrapper');
+    const $icon = document.createElement('i');
+    $icon.classList.add('fa-solid', 'fa-tag');
+    const $tagText = document.createElement('p');
+    $tagText.textContent = tag;
+    $tagWrapper.appendChild($icon);
+    $tagWrapper.appendChild($tagText);
+    $tagContainer?.appendChild($tagWrapper);
+  }
   $urlLinkInput.value = data.editing.url;
   $previewPhoto?.setAttribute('src', data.editing.url);
   $titleInput.value = data.editing.title;
@@ -286,5 +330,12 @@ $entriesSort?.addEventListener('input', (event) => {
     data.entries = data.entries.reverse();
     DOMLoadHandler();
     data.sort = $sortValue;
+  }
+});
+$tagContainer?.addEventListener('click', (event) => {
+  let $eventTarget = event.target;
+  if (data.editing === null) {
+    console.log($eventTarget);
+    // $tagContainer.removeChild($eventTarget);
   }
 });

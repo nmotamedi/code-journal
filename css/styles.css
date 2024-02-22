@@ -228,6 +228,10 @@ dialog {
   border-radius: 5px;
 }
 
+.button-col > button:hover {
+  cursor: pointer;
+}
+
 #search-bar > button {
   background-color: #fff;
   color: #4c2474;
@@ -253,4 +257,13 @@ dialog {
 
 .tag-wrapper > i {
   color: rgba(0, 0, 0, 0.489);
+}
+
+.fa-pencil:hover {
+  cursor: pointer;
+}
+
+.red {
+  color: rgb(200, 0, 0);
+  padding-left: 0.75rem;
 }

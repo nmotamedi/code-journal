@@ -92,10 +92,12 @@
           </div>
           <div class="row">
             <div class="column-full">
-              <label for="tags">Tags</label>
-              <textarea id="tags" name="tags" rows="1" cols="65"></textarea>
+              <label for="tags">Tags - Press spacebar to enter</label>
+              <input id="tags" name="tags" list="tagList" />
+              <datalist id="tagList"> </datalist>
             </div>
           </div>
+          <p class="hidden red warning">Tag has already been added</p>
           <div class="row tag-container"></div>
           <div class="row button-row">
             <div class="column-half delete-col hide">

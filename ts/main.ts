@@ -21,7 +21,7 @@ interface FormObject {
 const $urlLinkInput = document.querySelector('#photo-url') as HTMLInputElement;
 const $titleInput = document.querySelector('#title') as HTMLInputElement;
 const $notesInput = document.querySelector('#notes') as HTMLTextAreaElement;
-const $tagsInput = document.querySelector('#tags') as HTMLTextAreaElement;
+const $tagsInput = document.querySelector('#tags') as HTMLInputElement;
 const $entryForm = document.querySelector('#entry-form') as HTMLFormElement;
 const $previewPhoto = document.querySelector('.preview');
 const $ul = document.querySelector('ul');
@@ -35,6 +35,8 @@ const $confirmDelete = document.querySelector('.confirm-delete');
 const $searchBar = document.querySelector('.search-col');
 const $tagContainer = document.querySelector('.tag-container');
 const $search = document.querySelector('#search-bar') as HTMLFormElement;
+const $tagList = document.querySelector('#tagList');
+const $warning = document.querySelector('.warning');
 let currentTags: string[] = [];
 const $entriesSort = document.querySelector(
   '#entries-sort'
@@ -48,10 +50,11 @@ if (
   !$notesInput ||
   !$deleteButton ||
   !$search ||
-  !$tagsInput
+  !$tagsInput ||
+  !$tagList
 )
   throw new Error(
-    '$urlLinkInput, $entryForm, $ul, $entryTitle, $deleteButton, $search, $tagsInput or $notesInput query failed'
+    '$urlLinkInput, $entryForm, $ul, $tagList, $entryTitle, $deleteButton, $search, $tagsInput or $notesInput query failed'
   );
 if (!$openModal || !$closeModal || !$dialog || !$confirmDelete) {
   throw new Error(
@@ -67,11 +70,20 @@ $urlLinkInput.addEventListener('input', (event: Event) => {
 });
 
 $tagsInput.addEventListener('keydown', (event: KeyboardEvent) => {
-  if (event.key !== 'Enter') {
+  $warning?.classList.add('hidden');
+  if (event.key !== ' ') {
     return;
   }
-  const tag = $tagsInput.value;
+  const tag = $tagsInput.value.trim();
+  if (currentTags.includes(tag)) {
+    $tagsInput.value = '';
+    $warning!.textContent = `${tag} has already been added`;
+    $warning?.classList.remove('hidden');
+    return;
+  }
+  $tagsInput.focus();
   $tagsInput.value = '';
+  $tagsInput.placeholder = '';
   const $tagWrapper = document.createElement('div');
   $tagWrapper.classList.add('column', 'tag-wrapper');
   const $icon = document.createElement('i');
@@ -87,7 +99,6 @@ $tagsInput.addEventListener('keydown', (event: KeyboardEvent) => {
 $entryForm.addEventListener('submit', (event: Event) => {
   event.preventDefault();
   const $formElements = $entryForm.elements as FormElements;
-  currentTags = currentTags.map((tag: string) => tag.replace(/\n/g, ''));
   if (data.editing === null) {
     const $formObject: FormObject = {
       title: $formElements.title.value,
@@ -96,7 +107,6 @@ $entryForm.addEventListener('submit', (event: Event) => {
       entryID: data.nextEntryId,
       tags: currentTags,
     };
-    console.log($formObject.tags);
     data.nextEntryId++;
     const $newEntry = renderEntry($formObject);
     if (data.sort === 'newest-down') {
@@ -131,6 +141,15 @@ $entryForm.addEventListener('submit', (event: Event) => {
     data.editing = null;
     $deleteButton!.classList.add('hide');
   }
+  for (const tagMaster of currentTags) {
+    if (!data.tags.includes(tagMaster)) {
+      data.tags.push(tagMaster);
+      const $tagOption = document.createElement('option');
+      $tagOption.value = tagMaster;
+      $tagOption.textContent = tagMaster;
+      $tagList.appendChild($tagOption);
+    }
+  }
   viewSwap('entries');
 });
 
@@ -161,6 +180,19 @@ function renderEntry(entry: FormObject): HTMLLIElement {
   const $icon = document.createElement('i');
   $icon.classList.add('fa-solid', 'fa-pencil');
   const $paragraph = document.createElement('p');
+  const $tagEntriesContainer = document.createElement('div');
+  $tagEntriesContainer.classList.add('row', 'tag-container');
+  for (const tag of entry.tags) {
+    const $tagWrapper = document.createElement('div');
+    $tagWrapper.classList.add('column', 'tag-wrapper');
+    const $tagIcon = document.createElement('i');
+    $tagIcon.classList.add('fa-solid', 'fa-tag');
+    const $tagText = document.createElement('p');
+    $tagText.textContent = tag;
+    $tagWrapper.appendChild($tagIcon);
+    $tagWrapper.appendChild($tagText);
+    $tagEntriesContainer.appendChild($tagWrapper);
+  }
   $paragraph.textContent = entry.notes;
   $parColDiv.appendChild($paragraph);
   $parRowDiv.appendChild($parColDiv);
@@ -173,6 +205,7 @@ function renderEntry(entry: FormObject): HTMLLIElement {
   $imgColDiv.appendChild($image);
   $containingRowDiv.appendChild($imgColDiv);
   $containingRowDiv.appendChild($textColDiv);
+  $textColDiv.appendChild($tagEntriesContainer);
   $containingLi.appendChild($containingRowDiv);
   return $containingLi;
 }
@@ -250,7 +283,7 @@ $ul.addEventListener('click', (event: Event) => {
   const $eventTarget = event.target as HTMLElement;
   const $li = $eventTarget.closest('li');
   if (!$li) throw new Error('$li query failed');
-  if ($eventTarget.tagName !== 'I') {
+  if (!$eventTarget.className.includes('fa-pencil')) {
     return;
   }
   viewSwap('entry-form');
@@ -261,6 +294,17 @@ $ul.addEventListener('click', (event: Event) => {
       data.editing = entry;
     }
   });
+  for (const tag of data.editing!.tags) {
+    const $tagWrapper = document.createElement('div');
+    $tagWrapper.classList.add('column', 'tag-wrapper');
+    const $icon = document.createElement('i');
+    $icon.classList.add('fa-solid', 'fa-tag');
+    const $tagText = document.createElement('p');
+    $tagText.textContent = tag;
+    $tagWrapper.appendChild($icon);
+    $tagWrapper.appendChild($tagText);
+    $tagContainer?.appendChild($tagWrapper);
+  }
   $urlLinkInput.value = data.editing!.url;
   $previewPhoto?.setAttribute('src', data.editing!.url);
   $titleInput.value = data.editing!.title;
@@ -326,5 +370,13 @@ $entriesSort?.addEventListener('input', (event: Event) => {
     data.entries = data.entries.reverse();
     DOMLoadHandler();
     data.sort = $sortValue;
+  }
+});
+
+$tagContainer?.addEventListener('click', (event: Event) => {
+  const $eventTarget = event.target as HTMLDivElement;
+  if (data.editing === null) {
+    console.log($eventTarget);
+    // $tagContainer.removeChild($eventTarget);
   }
 });
