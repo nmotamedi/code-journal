@@ -235,3 +235,22 @@ dialog {
   width: fit-content;
   height: 21px;
 }
+
+.tag-wrapper {
+  margin: 0.25rem;
+  margin-left: 0.75rem;
+  padding: 0.5rem;
+  border-radius: 5px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #4c247470;
+}
+
+.tag-wrapper > p {
+  margin: 0;
+}
+
+.tag-wrapper > i {
+  color: rgba(0, 0, 0, 0.489);
+}

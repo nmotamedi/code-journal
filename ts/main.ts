@@ -15,11 +15,13 @@ interface FormObject {
   url: string;
   notes: string;
   entryID: number;
+  tags: string[];
 }
 
 const $urlLinkInput = document.querySelector('#photo-url') as HTMLInputElement;
 const $titleInput = document.querySelector('#title') as HTMLInputElement;
 const $notesInput = document.querySelector('#notes') as HTMLTextAreaElement;
+const $tagsInput = document.querySelector('#tags') as HTMLTextAreaElement;
 const $entryForm = document.querySelector('#entry-form') as HTMLFormElement;
 const $previewPhoto = document.querySelector('.preview');
 const $ul = document.querySelector('ul');
@@ -31,7 +33,9 @@ const $closeModal = document.querySelector('.dismiss-modal');
 const $dialog = document.querySelector('dialog');
 const $confirmDelete = document.querySelector('.confirm-delete');
 const $searchBar = document.querySelector('.search-col');
+const $tagContainer = document.querySelector('.tag-container');
 const $search = document.querySelector('#search-bar') as HTMLFormElement;
+let currentTags: string[] = [];
 const $entriesSort = document.querySelector(
   '#entries-sort'
 ) as HTMLSelectElement;
@@ -43,10 +47,11 @@ if (
   !$ul ||
   !$notesInput ||
   !$deleteButton ||
-  !$search
+  !$search ||
+  !$tagsInput
 )
   throw new Error(
-    '$urlLinkInput, $entryForm, $ul, $entryTitle, $deleteButton, $search or $notesInput query failed'
+    '$urlLinkInput, $entryForm, $ul, $entryTitle, $deleteButton, $search, $tagsInput or $notesInput query failed'
   );
 if (!$openModal || !$closeModal || !$dialog || !$confirmDelete) {
   throw new Error(
@@ -61,16 +66,37 @@ $urlLinkInput.addEventListener('input', (event: Event) => {
   }
 });
 
+$tagsInput.addEventListener('keydown', (event: KeyboardEvent) => {
+  if (event.key !== 'Enter') {
+    return;
+  }
+  const tag = $tagsInput.value;
+  $tagsInput.value = '';
+  const $tagWrapper = document.createElement('div');
+  $tagWrapper.classList.add('column', 'tag-wrapper');
+  const $icon = document.createElement('i');
+  $icon.classList.add('fa-solid', 'fa-tag');
+  const $tagText = document.createElement('p');
+  currentTags.push(tag);
+  $tagText.textContent = tag;
+  $tagWrapper.appendChild($icon);
+  $tagWrapper.appendChild($tagText);
+  $tagContainer?.appendChild($tagWrapper);
+});
+
 $entryForm.addEventListener('submit', (event: Event) => {
   event.preventDefault();
   const $formElements = $entryForm.elements as FormElements;
+  currentTags = currentTags.map((tag: string) => tag.replace(/\n/g, ''));
   if (data.editing === null) {
     const $formObject: FormObject = {
       title: $formElements.title.value,
       url: $formElements.url.value,
       notes: $formElements.notes.value,
       entryID: data.nextEntryId,
+      tags: currentTags,
     };
+    console.log($formObject.tags);
     data.nextEntryId++;
     const $newEntry = renderEntry($formObject);
     if (data.sort === 'newest-down') {
@@ -87,6 +113,7 @@ $entryForm.addEventListener('submit', (event: Event) => {
       url: $formElements.url.value,
       notes: $formElements.notes.value,
       entryID: data.editing.entryID,
+      tags: currentTags,
     };
     let updatingEntry = data.entries.find(
       (entry: FormObject) => entry.entryID === $formObject.entryID
@@ -201,11 +228,13 @@ function viewSwap(view: string): void {
   }
   data.view = view;
   $entryForm.reset();
+  currentTags = [];
   $previewPhoto?.setAttribute('src', 'images/placeholder-image-square.jpg');
   $deleteButton!.classList.add('hide');
   $entriesTitle!.textContent = 'Entries';
   $entryTitle!.textContent = 'New Entry';
   $entriesSort.classList.remove('hidden');
+  $tagContainer!.textContent = '';
 }
 
 const $anchors = document.querySelectorAll('a');

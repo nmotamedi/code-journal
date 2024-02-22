@@ -2,6 +2,7 @@
 const $urlLinkInput = document.querySelector('#photo-url');
 const $titleInput = document.querySelector('#title');
 const $notesInput = document.querySelector('#notes');
+const $tagsInput = document.querySelector('#tags');
 const $entryForm = document.querySelector('#entry-form');
 const $previewPhoto = document.querySelector('.preview');
 const $ul = document.querySelector('ul');
@@ -13,7 +14,9 @@ const $closeModal = document.querySelector('.dismiss-modal');
 const $dialog = document.querySelector('dialog');
 const $confirmDelete = document.querySelector('.confirm-delete');
 const $searchBar = document.querySelector('.search-col');
+const $tagContainer = document.querySelector('.tag-container');
 const $search = document.querySelector('#search-bar');
+let currentTags = [];
 const $entriesSort = document.querySelector('#entries-sort');
 if (
   !$entryTitle ||
@@ -23,10 +26,11 @@ if (
   !$ul ||
   !$notesInput ||
   !$deleteButton ||
-  !$search
+  !$search ||
+  !$tagsInput
 )
   throw new Error(
-    '$urlLinkInput, $entryForm, $ul, $entryTitle, $deleteButton, $search or $notesInput query failed'
+    '$urlLinkInput, $entryForm, $ul, $entryTitle, $deleteButton, $search, $tagsInput or $notesInput query failed'
   );
 if (!$openModal || !$closeModal || !$dialog || !$confirmDelete) {
   throw new Error(
@@ -39,16 +43,36 @@ $urlLinkInput.addEventListener('input', (event) => {
     $previewPhoto?.setAttribute('src', eventTarget.value);
   }
 });
+$tagsInput.addEventListener('keydown', (event) => {
+  if (event.key !== 'Enter') {
+    return;
+  }
+  const tag = $tagsInput.value;
+  $tagsInput.value = '';
+  const $tagWrapper = document.createElement('div');
+  $tagWrapper.classList.add('column', 'tag-wrapper');
+  const $icon = document.createElement('i');
+  $icon.classList.add('fa-solid', 'fa-tag');
+  const $tagText = document.createElement('p');
+  currentTags.push(tag);
+  $tagText.textContent = tag;
+  $tagWrapper.appendChild($icon);
+  $tagWrapper.appendChild($tagText);
+  $tagContainer?.appendChild($tagWrapper);
+});
 $entryForm.addEventListener('submit', (event) => {
   event.preventDefault();
   const $formElements = $entryForm.elements;
+  currentTags = currentTags.map((tag) => tag.replace(/\n/g, ''));
   if (data.editing === null) {
     const $formObject = {
       title: $formElements.title.value,
       url: $formElements.url.value,
       notes: $formElements.notes.value,
       entryID: data.nextEntryId,
+      tags: currentTags,
     };
+    console.log($formObject.tags);
     data.nextEntryId++;
     const $newEntry = renderEntry($formObject);
     if (data.sort === 'newest-down') {
@@ -65,6 +89,7 @@ $entryForm.addEventListener('submit', (event) => {
       url: $formElements.url.value,
       notes: $formElements.notes.value,
       entryID: data.editing.entryID,
+      tags: currentTags,
     };
     let updatingEntry = data.entries.find(
       (entry) => entry.entryID === $formObject.entryID
@@ -172,11 +197,13 @@ function viewSwap(view) {
   }
   data.view = view;
   $entryForm.reset();
+  currentTags = [];
   $previewPhoto?.setAttribute('src', 'images/placeholder-image-square.jpg');
   $deleteButton.classList.add('hide');
   $entriesTitle.textContent = 'Entries';
   $entryTitle.textContent = 'New Entry';
   $entriesSort.classList.remove('hidden');
+  $tagContainer.textContent = '';
 }
 const $anchors = document.querySelectorAll('a');
 $anchors.forEach((anchor) => {
