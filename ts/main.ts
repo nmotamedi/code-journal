@@ -36,7 +36,9 @@ const $searchBar = document.querySelector('.search-col');
 const $tagContainer = document.querySelector('.tag-container');
 const $search = document.querySelector('#search-bar') as HTMLFormElement;
 const $tagList = document.querySelector('#tagList');
+const $tagSort = document.querySelector('#tag-sort');
 const $warning = document.querySelector('.warning');
+const $entriesContainer = document.querySelector('.entries-container');
 let currentTags: string[] = [];
 const $entriesSort = document.querySelector(
   '#entries-sort'
@@ -76,6 +78,9 @@ $tagsInput.addEventListener('keydown', (event: KeyboardEvent) => {
   }
   event.preventDefault();
   const tag = $tagsInput.value.trim();
+  if (tag === '') {
+    return;
+  }
   if (currentTags.includes(tag)) {
     $tagsInput.value = '';
     $warning!.textContent = `${tag} has already been added`;
@@ -149,6 +154,8 @@ $entryForm.addEventListener('submit', (event: Event) => {
       $tagOption.value = tagMaster;
       $tagOption.textContent = tagMaster;
       $tagList.appendChild($tagOption);
+      const $tagSelectOption = $tagOption.cloneNode(true);
+      $tagSort!.appendChild($tagSelectOption);
     }
   }
   viewSwap('entries');
@@ -229,11 +236,14 @@ function DOMLoadHandler(): void {
     const $newEntry = renderEntry(entry);
     $ul!.append($newEntry);
   });
+  data.tags.sort();
   data.tags.forEach((tag: string) => {
     const $tagOption = document.createElement('option');
     $tagOption.value = tag;
     $tagOption.textContent = tag;
     $tagList!.appendChild($tagOption);
+    const $tagSelectOption = $tagOption.cloneNode(true);
+    $tagSort!.appendChild($tagSelectOption);
   });
 }
 
@@ -339,6 +349,11 @@ $confirmDelete.addEventListener('click', () => {
     });
     if (count === 1) {
       const masterTagIndex = data.tags.indexOf($tagText!);
+      const $selectedOptions = document.querySelectorAll(
+        `option[value=${$tagText}]`
+      ) as NodeListOf<Node>;
+      $tagList.removeChild($selectedOptions[0]);
+      $tagSort?.removeChild($selectedOptions[1]);
       data.tags.splice(masterTagIndex, 1);
     }
   }
@@ -364,7 +379,6 @@ $search.addEventListener('submit', (event: Event) => {
   const $searchQuery: string = $formElements.search.value;
   const $searchSelector: string = $formElements['search-select'].value;
   $search.reset();
-  $entriesTitle!.textContent = 'Results:';
   $entriesSort.classList.add('hidden');
   for (const entry of data.entries) {
     let prop = '';
@@ -376,6 +390,7 @@ $search.addEventListener('submit', (event: Event) => {
         prop = entry.notes;
         break;
     }
+    $entriesTitle!.textContent = `Results: ${$searchSelector} - ${$searchQuery}`;
     if (!prop.includes($searchQuery)) {
       const $oldEntry = document.querySelector(`[data-id='${entry.entryID}']`);
       $oldEntry?.classList.add('hidden');
@@ -406,10 +421,59 @@ $tagContainer?.addEventListener('click', (event: Event) => {
     });
     if (count === 1) {
       const masterTagIndex = data.tags.indexOf($tagText!);
+      const $selectedOptions = document.querySelectorAll(
+        `option[value=${$tagText}]`
+      ) as NodeListOf<Node>;
+      $tagList.removeChild($selectedOptions[0]);
+      $tagSort?.removeChild($selectedOptions[1]);
       data.tags.splice(masterTagIndex, 1);
     }
   }
   $tagContainer.removeChild($tagDiv);
   const currentTagIndex = currentTags.indexOf($tagText!);
   currentTags.splice(currentTagIndex, 1);
+});
+
+$tagSort?.addEventListener('input', (event: Event) => {
+  const $eventTarget = event.target as HTMLSelectElement;
+  const $sortByTag = $eventTarget.value;
+  data.entries.forEach((entry: FormObject) => {
+    const $oldEntry = document.querySelector(`[data-id='${entry.entryID}']`);
+    $oldEntry?.classList.remove('hidden');
+  });
+  if ($sortByTag === '') {
+    $entriesTitle!.textContent = 'Entries';
+    $entriesSort.classList.remove('hidden');
+    return;
+  }
+  $entriesTitle!.textContent = `Results: Tag - ${$sortByTag}`;
+  $entriesSort.classList.add('hidden');
+  for (const entry of data.entries) {
+    if (!entry.tags.includes($sortByTag)) {
+      const $oldEntry = document.querySelector(`[data-id='${entry.entryID}']`);
+      $oldEntry?.classList.add('hidden');
+    }
+  }
+});
+
+$entriesContainer?.addEventListener('click', (event: Event) => {
+  const $eventTarget = event.target as HTMLSelectElement;
+  const $closestDiv = $eventTarget.closest('div');
+  if ($closestDiv?.classList.contains('tag-wrapper')) {
+    const $sortByTag = $closestDiv.textContent;
+    data.entries.forEach((entry: FormObject) => {
+      const $oldEntry = document.querySelector(`[data-id='${entry.entryID}']`);
+      $oldEntry?.classList.remove('hidden');
+    });
+    $entriesTitle!.textContent = `Results: Tag - ${$sortByTag}`;
+    $entriesSort.classList.add('hidden');
+    for (const entry of data.entries) {
+      if (!entry.tags.includes($sortByTag!)) {
+        const $oldEntry = document.querySelector(
+          `[data-id='${entry.entryID}']`
+        );
+        $oldEntry?.classList.add('hidden');
+      }
+    }
+  }
 });
