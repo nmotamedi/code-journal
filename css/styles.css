@@ -145,7 +145,7 @@ dialog {
 }
 
 .entries-title-row > div {
-  flex-basis: content;
+  flex-basis: 50%;
 }
 
 .new-col {
@@ -161,6 +161,7 @@ dialog {
 .sort-new-row {
   margin-bottom: 0;
   align-items: center;
+  justify-content: flex-end;
 }
 
 .sort-col {
@@ -270,4 +271,15 @@ dialog {
 .red {
   color: rgb(200, 0, 0);
   padding-left: 0.75rem;
+}
+
+#tag-sort {
+  width: 160px;
+  height: 30px;
+}
+
+.tag-sort-col {
+  padding: 0;
+  flex-basis: content;
+  border-radius: 10px;
 }
